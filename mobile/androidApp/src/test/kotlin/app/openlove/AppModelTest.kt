@@ -19,6 +19,7 @@ import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.TextContent
 import io.ktor.http.headersOf
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.CompletableJob
@@ -49,6 +50,7 @@ class AppModelTest {
 
     private val calls = mutableListOf<String>()
     private val homeBearers = mutableListOf<String?>()
+    private val moodBodies = mutableListOf<String>()
     private var pairingStatus = HttpStatusCode.OK
     private var pairingHtml: String? = null
     private var signInStatus = HttpStatusCode.OK
@@ -89,6 +91,10 @@ class AppModelTest {
                 reply(homeStatuses.removeFirstOrNull() ?: HttpStatusCode.OK, fixture("home.json").toString())
             }
             "/api/theme" -> reply(HttpStatusCode.OK, fixture("theme.json").toString())
+            "/api/mood" -> {
+                moodBodies += (req.body as TextContent).text
+                reply(HttpStatusCode.OK, fixture("home.json").toString())
+            }
             else -> respond("", HttpStatusCode.NotFound)
         }
     }
@@ -194,6 +200,17 @@ class AppModelTest {
             val model = newModel()
             model.pair(link)
             assertEquals(Screen.Pairing(PairingError.Unreachable), model.screen.value)
+            scope.cancelAndJoin()
+        }
+
+    @Test
+    fun setMoodSendsTodayAndShowsAccueil() =
+        runTest {
+            val model = newModel()
+            model.pair(link)
+            model.setMood("sad")
+            assertEquals(listOf("""{"mood":"sad"}"""), moodBodies)
+            assertEquals(Screen.Home(homeFixture), model.screen.value)
             scope.cancelAndJoin()
         }
 

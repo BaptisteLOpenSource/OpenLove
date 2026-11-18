@@ -14,6 +14,7 @@ const member = {
 const home = {
   milestone: { years: 0, months: 0, days: 0, totalDays: 0 },
   upcomingDate: null,
+  mood: { mine: null, partner: null },
 };
 
 vi.mock("server-only", () => ({}));
@@ -51,5 +52,5 @@ test("Bearer member -> 200 contract-valid home of their Couple", async () => {
   const { data } = await res.json();
   expect(homeResponse.safeParse(data).success).toBe(true);
   expect(serverClient).toHaveBeenCalledWith("t1");
-  expect(getHome).toHaveBeenCalledWith(sb, "c1");
+  expect(getHome).toHaveBeenCalledWith(sb, "c1", "u1");
 });

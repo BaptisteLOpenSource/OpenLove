@@ -11,6 +11,10 @@
         "label": "Anniversaire",
         "date": "2026-11-05",
         "inDays": 6
+      },
+      "mood": {
+        "mine": "happy",
+        "partner": "calm"
       }
     },
     {
@@ -20,7 +24,11 @@
         "days": 0,
         "totalDays": 0
       },
-      "upcomingDate": null
+      "upcomingDate": null,
+      "mood": {
+        "mine": null,
+        "partner": null
+      }
     }
   ],
   "invalid": [
@@ -30,7 +38,8 @@
         "months": 0,
         "days": 0,
         "totalDays": 0
-      }
+      },
+      "upcomingDate": null
     },
     {
       "milestone": {
@@ -43,6 +52,10 @@
         "label": "Anniversaire",
         "date": "2026-11-05",
         "inDays": 31
+      },
+      "mood": {
+        "mine": "happy",
+        "partner": "calm"
       }
     },
     {
@@ -56,6 +69,10 @@
         "label": "Anniversaire",
         "date": "05/11/2026",
         "inDays": 6
+      },
+      "mood": {
+        "mine": "happy",
+        "partner": "calm"
       }
     },
     {
@@ -65,7 +82,48 @@
         "days": 3,
         "totalDays": -1
       },
-      "upcomingDate": null
+      "upcomingDate": {
+        "label": "Anniversaire",
+        "date": "2026-11-05",
+        "inDays": 6
+      },
+      "mood": {
+        "mine": "happy",
+        "partner": "calm"
+      }
+    },
+    {
+      "milestone": {
+        "years": 1,
+        "months": 2,
+        "days": 3,
+        "totalDays": 430
+      },
+      "upcomingDate": {
+        "label": "Anniversaire",
+        "date": "2026-11-05",
+        "inDays": 6
+      },
+      "mood": {
+        "mine": "angry",
+        "partner": null
+      }
+    },
+    {
+      "milestone": {
+        "years": 1,
+        "months": 2,
+        "days": 3,
+        "totalDays": 430
+      },
+      "upcomingDate": {
+        "label": "Anniversaire",
+        "date": "2026-11-05",
+        "inDays": 6
+      },
+      "mood": {
+        "mine": "happy"
+      }
     }
   ]
 }

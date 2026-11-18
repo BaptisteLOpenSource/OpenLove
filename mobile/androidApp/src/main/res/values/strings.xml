@@ -21,6 +21,15 @@
     <string name="home_upcoming_none">Aucune date prévue</string>
     <string name="home_upcoming_today">aujourd\'hui</string>
     <string name="home_open_chat">Messages</string>
+    <string name="mood_title">Humeur du jour</string>
+    <string name="mood_mine">Toi : %s</string>
+    <string name="mood_partner">Partenaire : %s</string>
+    <string name="mood_none">Pas encore</string>
+    <string name="mood_happy">Joyeux</string>
+    <string name="mood_calm">Calme</string>
+    <string name="mood_tired">Fatigué</string>
+    <string name="mood_sad">Triste</string>
+    <string name="mood_anxious">Anxieux</string>
     <string name="chat_title">Messages</string>
     <string name="chat_hint">Écrire un message</string>
     <string name="chat_send">Envoyer</string>

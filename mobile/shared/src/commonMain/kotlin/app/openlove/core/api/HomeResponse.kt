@@ -6,7 +6,23 @@ import kotlinx.serialization.Serializable
 data class HomeResponse(
     val milestone: Milestone,
     val upcomingDate: UpcomingDate?,
+    val mood: MoodState,
 )
+
+// Humeur of today: own and other Partenaire's, null = not set.
+@Serializable
+data class MoodState(
+    val mine: String?,
+    val partner: String?,
+) {
+    init {
+        require(mine == null || mine in MOODS)
+        require(partner == null || partner in MOODS)
+    }
+}
+
+// Mirrors web moodValue (web/src/shared/contracts/home.ts).
+val MOODS = setOf("happy", "calm", "tired", "sad", "anxious")
 
 @Serializable
 data class Milestone(

@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 
 import { signOut } from "@/features/couple/server/auth";
 import { getHome, getPartnerNames } from "@/features/home/server/getHome";
+import { setMoodAction } from "@/features/home/server/moodAction";
 import { Milestone } from "@/features/home/ui/Milestone";
+import { Mood } from "@/features/home/ui/Mood";
 import { UpcomingDate } from "@/features/home/ui/UpcomingDate";
 import { partnerOf, serverClient } from "@/shared/supabase/server";
 
@@ -14,7 +16,7 @@ export default async function HomePage() {
   if (!result.ok) redirect("/login");
   const t = await getTranslations("home");
   const [home, names] = await Promise.all([
-    getHome(sb, result.partner.coupleId),
+    getHome(sb, result.partner.coupleId, result.partner.userId),
     getPartnerNames(sb, result.partner.coupleId),
   ]);
   return (
@@ -22,6 +24,7 @@ export default async function HomePage() {
       <h1 className="text-headline-large">{t("partners", names)}</h1>
       <Milestone value={home.milestone} />
       <UpcomingDate value={home.upcomingDate} />
+      <Mood value={home.mood} action={setMoodAction} />
       <Link href="/messages" className="rounded-full border px-4 py-2">
         {t("messages")}
       </Link>
