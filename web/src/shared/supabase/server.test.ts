@@ -15,7 +15,10 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ getAll: () => [], set: 
 
 beforeEach(() => {
   vi.clearAllMocks();
-  getUser.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+  getUser.mockResolvedValue({
+    data: { user: { id: "u1", app_metadata: { role: "partner_b" } } },
+    error: null,
+  });
   maybeSingle.mockResolvedValue({ data: { couple_id: "c1", role: "partner_b" }, error: null });
   vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
   vi.stubEnv("SUPABASE_ANON_KEY", "a");
@@ -31,7 +34,7 @@ test("member -> partner with couple and role", async () => {
     partner: { userId: "u1", coupleId: "c1", role: "partner_b" },
   });
   expect(from).toHaveBeenCalledWith("couple_members");
-  expect(select).toHaveBeenCalledWith("couple_id, role");
+  expect(select).toHaveBeenCalledWith("couple_id");
   expect(eq).toHaveBeenCalledWith("user_id", "u1");
 });
 

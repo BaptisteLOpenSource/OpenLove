@@ -1,0 +1,92 @@
+---
+title: Développer OpenLove
+description: Guide développeur. Supabase CLI local, secrets et web/.env.local.
+---
+
+Ce guide prépare un environnement de développement local.
+
+## Prérequis
+
+- Node.js 22.23.4 ou plus récent.
+- Docker (requis par Supabase CLI en local).
+- Git, et `openssl` (Linux, macOS, Git Bash) ou PowerShell (Windows).
+
+## 1. Générer les secrets
+
+Aucune installation : `openssl` et PowerShell sont fournis avec leur système.
+
+Linux, macOS, Git Bash :
+
+```bash
+openssl rand -base64 32
+```
+
+PowerShell (Windows PowerShell 5.1 et PowerShell 7) :
+
+```powershell
+$octets = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($octets)
+[Convert]::ToBase64String($octets)
+```
+
+Les deux commandes produisent `<génère-ta-valeur>` : 44 caractères base64 qui se terminent par `=`.
+Ne les committez jamais.
+
+## 2. Lancer Supabase en local
+
+Depuis la racine du dépôt (là où se trouve `supabase/config.toml`) :
+
+```bash
+npx supabase start
+```
+
+La commande affiche l'URL de l'API et deux clés. Pour les revoir plus tard :
+
+```bash
+npx supabase status
+```
+
+La sortie contient aussi les nouvelles clés `PUBLISHABLE_KEY` et `SECRET_KEY`. L'application utilise les clés `ANON_KEY` et `SERVICE_ROLE_KEY` : ce sont celles à copier.
+
+| Clé dans la sortie de `supabase start` | Variable |
+|---|---|
+| `API_URL` | `SUPABASE_URL` |
+| `ANON_KEY` | `SUPABASE_ANON_KEY` |
+| `SERVICE_ROLE_KEY` | `SUPABASE_SERVICE_ROLE_KEY` |
+
+## SUPABASE_URL
+
+Valeur : `API_URL` affichée par `supabase start`, typiquement `http://127.0.0.1:54321`.
+
+## SUPABASE_ANON_KEY
+
+Valeur : `ANON_KEY` affichée par `supabase start`. Clé publique, côté navigateur.
+
+## SUPABASE_SERVICE_ROLE_KEY
+
+Valeur : la clé Secret affichée par `supabase start`. Ne jamais l'exposer côté navigateur.
+
+## MESSAGE_ENCRYPTION_KEY
+
+Valeur : la sortie de la commande `openssl rand -base64 32` (ou du bloc PowerShell) de l'étape 1.
+
+## 3. Fichier `web/.env.local`
+
+Le fichier est ignoré par Git. Next.js le charge automatiquement :
+
+```bash
+SUPABASE_URL=<colle-la-valeur-de-supabase-start>
+SUPABASE_ANON_KEY=<colle-la-valeur-de-supabase-start>
+SUPABASE_SERVICE_ROLE_KEY=<colle-la-valeur-de-supabase-start>
+NEXT_PUBLIC_SUPABASE_URL=<même-valeur-que-SUPABASE_URL>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<même-valeur-que-SUPABASE_ANON_KEY>
+MESSAGE_ENCRYPTION_KEY=<génère-ta-valeur>
+```
+
+## 4. Vérifier
+
+```bash
+cd web && pnpm dev
+```
+
+Ouvrez `http://localhost:3000/setup`. La page liste chaque variable attendue, générée depuis le schéma d'environnement : toutes doivent être vertes.
