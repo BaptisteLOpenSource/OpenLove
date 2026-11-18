@@ -21,11 +21,15 @@ const mood = z.strictObject({
   partner: moodValue.nullable(),
 });
 
+const moodDay = mood.extend({ day: z.iso.date() });
+
 export const homeResponse = z.strictObject({
   milestone,
   upcomingDate: upcomingDate.nullable(),
   // Humeur of today (Couple time zone): own and the other Partenaire's, null = not set
   mood,
+  // days before today, newest first, same window for both Partenaires
+  moodHistory: z.array(moodDay).max(6),
 });
 
 export const setMoodInput = z.strictObject({ mood: moodValue });
@@ -34,6 +38,7 @@ const home = {
   milestone: { years: 1, months: 2, days: 3, totalDays: 430 },
   upcomingDate: { label: "Anniversaire", date: "2026-11-05", inDays: 6 },
   mood: { mine: "happy", partner: "calm" },
+  moodHistory: [{ day: "2026-10-29", mine: "tired", partner: null }],
 };
 
 export const examples = {
@@ -43,6 +48,7 @@ export const examples = {
       milestone: { years: 0, months: 0, days: 0, totalDays: 0 },
       upcomingDate: null,
       mood: { mine: null, partner: null },
+      moodHistory: [],
     },
   ],
   invalid: [
@@ -52,5 +58,6 @@ export const examples = {
     { ...home, milestone: { ...home.milestone, totalDays: -1 } },
     { ...home, mood: { mine: "angry", partner: null } },
     { ...home, mood: { mine: "happy" } },
+    { ...home, moodHistory: [{ day: "29/10/2026", mine: null, partner: null }] },
   ],
 };

@@ -1,37 +1,47 @@
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 
-import { type MoodValue, moodValue } from "@/shared/contracts/home";
+import type { MoodValue } from "@/shared/contracts/home";
 
-import type { Mood as MoodState } from "../domain/mood";
+import type { Mood as MoodState, MoodDay } from "../domain/mood";
+import { MoodPicker } from "./MoodPicker";
 
 export function Mood({
   value,
+  history,
   action,
 }: {
   value: MoodState;
+  history: MoodDay[];
   action: (form: FormData) => Promise<void>;
 }) {
   const t = useTranslations("home.mood");
-  const label = (m: MoodValue | null) => (m ? t(`values.${m}`) : t("none"));
+  const format = useFormatter();
+  const label = (m: MoodValue | null, none: string) => (m ? t(`values.${m}`) : none);
   return (
     <section className="flex flex-col items-center gap-2">
       <h2 className="text-title-medium">{t("title")}</h2>
-      <p className="text-body-large">{t("mineLine", { value: label(value.mine) })}</p>
-      <p className="text-body-large">{t("partnerLine", { value: label(value.partner) })}</p>
-      <form action={action} className="flex flex-wrap justify-center gap-2">
-        {moodValue.options.map((m) => (
-          <button
-            key={m}
-            type="submit"
-            name="mood"
-            value={m}
-            aria-pressed={value.mine === m}
-            className="rounded-full border px-3 py-1"
-          >
-            {t(`values.${m}`)}
-          </button>
+      <p className="text-body-large">{t("mineLine", { value: label(value.mine, t("none")) })}</p>
+      <p className="text-body-large">
+        {t("partnerLine", { value: label(value.partner, t("none")) })}
+      </p>
+      <MoodPicker action={action} mine={value.mine} />
+      <h3 className="text-title-small">{t("historyTitle")}</h3>
+      <ul className="text-body-medium">
+        {history.map((d) => (
+          <li key={d.day}>
+            {t("historyLine", {
+              day: format.dateTime(new Date(`${d.day}T00:00:00Z`), {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+                timeZone: "UTC",
+              }),
+              mine: label(d.mine, t("historyNone")),
+              partner: label(d.partner, t("historyNone")),
+            })}
+          </li>
         ))}
-      </form>
+      </ul>
     </section>
   );
 }

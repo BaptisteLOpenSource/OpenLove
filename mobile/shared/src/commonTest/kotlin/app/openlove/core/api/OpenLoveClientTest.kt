@@ -38,7 +38,8 @@ private val s1 = Session("a1", "r1", 100)
 private val s2 = Session("a2", "r2", 200)
 private const val SESSION2 = """{"data":{"accessToken":"a2","refreshToken":"r2","expiresAt":200}}"""
 private const val HOME =
-    """{"data":{"milestone":{"years":1,"months":2,"days":3,"totalDays":430},"upcomingDate":null,"mood":{"mine":null,"partner":null}}}"""
+    """{"data":{"milestone":{"years":1,"months":2,"days":3,"totalDays":430},"upcomingDate":null,""" +
+        """"mood":{"mine":null,"partner":null},"moodHistory":[]}}"""
 private const val MESSAGE = """{"data":{"id":"7","authorId":"u","body":"Salut","createdAt":"2026-11-18T10:00:00.000Z"}}"""
 private const val UNAUTHORIZED = """{"error":{"code":"unauthorized","message":"nope"}}"""
 

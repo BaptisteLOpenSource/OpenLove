@@ -7,7 +7,12 @@ data class HomeResponse(
     val milestone: Milestone,
     val upcomingDate: UpcomingDate?,
     val mood: MoodState,
-)
+    val moodHistory: List<MoodDay>,
+) {
+    init {
+        require(moodHistory.size <= 6)
+    }
+}
 
 // Humeur of today: own and other Partenaire's, null = not set.
 @Serializable
@@ -16,6 +21,20 @@ data class MoodState(
     val partner: String?,
 ) {
     init {
+        require(mine == null || mine in MOODS)
+        require(partner == null || partner in MOODS)
+    }
+}
+
+// One day of Humeur history, same window for both Partenaires.
+@Serializable
+data class MoodDay(
+    val day: String,
+    val mine: String?,
+    val partner: String?,
+) {
+    init {
+        require(Regex("\\d{4}-\\d{2}-\\d{2}").matches(day))
         require(mine == null || mine in MOODS)
         require(partner == null || partner in MOODS)
     }

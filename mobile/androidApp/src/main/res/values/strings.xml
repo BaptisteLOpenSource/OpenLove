@@ -25,6 +25,12 @@
     <string name="mood_mine">Toi : %s</string>
     <string name="mood_partner">Partenaire : %s</string>
     <string name="mood_none">Pas encore</string>
+    <string name="mood_open">Choisir mon humeur</string>
+    <string name="mood_close">Fermer</string>
+    <string name="mood_selected">%s (actuelle)</string>
+    <string name="mood_history_title">Ces derniers jours</string>
+    <string name="mood_history_line">%1$s : toi %2$s, partenaire %3$s</string>
+    <string name="mood_history_none">rien</string>
     <string name="mood_happy">Joyeux</string>
     <string name="mood_calm">Calme</string>
     <string name="mood_tired">Fatigué</string>

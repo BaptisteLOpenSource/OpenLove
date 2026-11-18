@@ -37,6 +37,7 @@ beforeEach(() => {
     milestone: { years: 6, months: 8, days: 5, totalDays: 2439 },
     upcomingDate: null,
     mood: { mine: null, partner: "calm" },
+    moodHistory: [{ day: "2026-11-17", mine: "sad", partner: null }],
   });
   getPartnerNames.mockResolvedValue({ a: "Alex", b: "Sam" });
 });
@@ -64,5 +65,7 @@ test("member -> Compteur, Prochaine date and logout button", async () => {
   expect(screen.getByText(fr.home.milestone.title)).toBeTruthy();
   expect(screen.getByText(fr.home.upcomingDate.title)).toBeTruthy();
   expect(screen.getByText(fr.home.mood.title)).toBeTruthy();
+  expect(screen.getByText(fr.home.mood.historyTitle)).toBeTruthy();
+  expect(screen.getByText(/toi Triste, partenaire rien/)).toBeTruthy();
   expect(screen.getByRole("button", { name: fr.home.logout })).toBeTruthy();
 });

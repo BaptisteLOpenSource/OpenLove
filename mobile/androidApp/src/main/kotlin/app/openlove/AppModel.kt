@@ -46,7 +46,18 @@ class AppModel(
         if (client.isPaired()) showHome() else _screen.value = Screen.Pairing()
     }
 
-    suspend fun setMood(mood: String) = showHome { client.setMood(mood) }
+    // From the chat header the user stays in the chat; only its Accueil copy is refreshed.
+    suspend fun setMood(mood: String) {
+        if (_screen.value !is Screen.Chat) return showHome { client.setMood(mood) }
+        try {
+            val home = Screen.Home(client.setMood(mood))
+            (_screen.value as? Screen.Chat)?.let { _screen.value = it.copy(home = home) }
+        } catch (e: ApiException) {
+            if (e.status == 401) _screen.value = Screen.Pairing()
+        } catch (e: IOException) {
+            // chat shows its own connection state
+        }
+    }
 
     private suspend fun showHome(load: suspend () -> HomeResponse = { client.home() }) {
         _screen.value =

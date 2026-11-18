@@ -109,7 +109,14 @@
         "tired": "Fatigué",
         "sad": "Triste",
         "anxious": "Anxieux"
-      }
+      },
+      "open": "Choisir mon humeur",
+      "close": "Fermer",
+      "historyTitle": "Ces derniers jours",
+      "historyLine": "{day} : toi {mine}, partenaire {partner}",
+      "historyNone": "rien",
+      "banner": "Pas encore d'humeur aujourd'hui. Comment ça va ?",
+      "dismiss": "Masquer"
     }
   },
   "messages": {

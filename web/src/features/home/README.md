@@ -15,3 +15,8 @@ Accueil: the first screen of a Partenaire. Holds the Compteur.
 - Language: Humeur (`mood`) = one value per Partenaire per day (Couple time zone), from `moodValue`.
   Setting it again the same day replaces it (upsert on `partner_id, day`). Both Partenaires see both.
 - Invariant (Humeur): RLS lets a Partenaire write only their own row of their Couple; reads are Couple-wide.
+- Humeur history (`moodHistory`): the 6 days before today, newest first, same window for both
+  Partenaires, empty days kept as nulls. One picker (`MoodPicker`) for every entry point: Accueil,
+  desktop banner, chat header (web and Android).
+- Banner: desktop only (mobile gets the Rappel push, #25), shown while no own Humeur today.
+  Dismiss hides it 48 h on this device (`localStorage`).
