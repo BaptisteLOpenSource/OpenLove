@@ -13,6 +13,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     include: ["src/**/*.test.{ts,tsx}", "test/**/*.test.ts"],
+    // integration files re-seed one shared local DB: serial avoids RLS races
+    fileParallelism: false,
     env: existsSync(local) ? parseEnv(readFileSync(local, "utf8")) : {},
   },
 });
