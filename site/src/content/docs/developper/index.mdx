@@ -46,21 +46,21 @@ La commande affiche l'URL de l'API et deux clés. Pour les revoir plus tard :
 npx supabase status
 ```
 
-Correspondance entre la sortie de la CLI et les variables de l'application :
+La sortie contient aussi les nouvelles clés `PUBLISHABLE_KEY` et `SECRET_KEY`. L'application utilise les clés `ANON_KEY` et `SERVICE_ROLE_KEY` : ce sont celles à copier.
 
-| Sortie de `supabase start` | Variable |
+| Clé dans la sortie de `supabase start` | Variable |
 |---|---|
-| API URL | `SUPABASE_URL` |
-| Publishable | `SUPABASE_ANON_KEY` |
-| Secret | `SUPABASE_SERVICE_ROLE_KEY` |
+| `API_URL` | `SUPABASE_URL` |
+| `ANON_KEY` | `SUPABASE_ANON_KEY` |
+| `SERVICE_ROLE_KEY` | `SUPABASE_SERVICE_ROLE_KEY` |
 
 ## SUPABASE_URL
 
-Valeur : l'API URL affichée par `supabase start`, typiquement `http://127.0.0.1:54321`.
+Valeur : `API_URL` affichée par `supabase start`, typiquement `http://127.0.0.1:54321`.
 
 ## SUPABASE_ANON_KEY
 
-Valeur : la clé Publishable affichée par `supabase start`. Clé publique, côté navigateur.
+Valeur : `ANON_KEY` affichée par `supabase start`. Clé publique, côté navigateur.
 
 ## SUPABASE_SERVICE_ROLE_KEY
 
