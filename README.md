@@ -1,30 +1,64 @@
-# OpenLove
+<h1 align="center">OpenLove 💞</h1>
 
-[![Licence : MIT](https://img.shields.io/github/license/BaptisteLeDev/OpenLove)](LICENSE)
-[![Statut : pré-code](https://img.shields.io/badge/statut-pr%C3%A9--code-lightgrey)](#statut)
-[![Contributions bienvenues](https://img.shields.io/badge/contributions-bienvenues-brightgreen)](CONTRIBUTING.md)
-[![Code de conduite](https://img.shields.io/badge/code%20de%20conduite-Contributor%20Covenant-blue)](CODE_OF_CONDUCT.md)
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+<p align="center">
+  App de couple auto-hébergeable : chat temps réel, surprises et lettres verrouillées dans le temps,
+  collections partagées et calendrier.<br>
+  Web (PWA) et Android, une instance par couple.
+</p>
 
-> Une application de couple propre et auto-hébergeable : chat temps réel, surprises et lettres
-> verrouillées dans le temps, collections partagées et calendrier. Web (PWA) et Android, une
-> instance par couple.
+<p align="center">
+  <a href="https://github.com/BaptisteLOpenSource/OpenLove/actions/workflows/ci.yml"><img alt="Statut du CI" src="https://github.com/BaptisteLOpenSource/OpenLove/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="Licence MIT" src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
+  <img alt="Statut : en développement" src="https://img.shields.io/badge/statut-en%20d%C3%A9veloppement-informational.svg">
+  <a href="CONTRIBUTING.md"><img alt="Contributions bienvenues" src="https://img.shields.io/badge/contributions-bienvenues-brightgreen.svg"></a>
+  <a href="CODE_OF_CONDUCT.md"><img alt="Code de conduite" src="https://img.shields.io/badge/code%20de%20conduite-Contributor%20Covenant-blue.svg"></a>
+</p>
+
+<p align="center">
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-000000.svg?style=for-the-badge&logo=nextdotjs&logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white">
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-%233ECF8E.svg?style=for-the-badge&logo=supabase&logoColor=white">
+  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white">
+  <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-%234285F4.svg?style=for-the-badge&logo=jetpackcompose&logoColor=white">
+</p>
+
+> Captures d'écran : à venir.
+
+## Sommaire
+
+- [À propos](#à-propos)
+- [Statut](#statut)
+- [Démarrage rapide](#démarrage-rapide-sans-terminal)
+- [Fonctionnalités](#fonctionnalités-v1)
+- [Stack](#stack)
+- [Démarrage développeur](#démarrage-développeur)
+- [Contribuer](#contribuer)
+- [Documentation](#documentation)
+- [Licence](#licence)
+
+## À propos
 
 **OpenLove** est la réécriture open source de l'application privée d'un couple. Rien de personnel
 n'est livré : ni noms, ni contenu privé, ni éléments personnels. Tu déploies, tu configures, et ça
 devient la tienne.
 
-## À propos
-
-Conçue pour deux personnes, pas pour une plateforme. Une instance sert un seul couple, tu gardes
-tes données (ton Supabase, ton stockage), et la révélation des surprises est décidée par l'horloge
-du serveur : rien ne peut être spoilé depuis le client.
+Conçue pour deux personnes, pas pour une plateforme. Une instance sert un seul couple, tu gardes tes
+données (ton Supabase, ton stockage), et la révélation des surprises est décidée par l'horloge du
+serveur : rien ne peut être spoilé depuis le client.
 
 ## Statut
 
-Pré-code. L'architecture et le plan sont posés ; l'implémentation démarre avec l'Epic E0. Suis
-l'avancement sur le tableau de projet GitHub.
+En développement. L'Epic E0 (squelettes web et Android, CI) est terminée ; les fonctionnalités
+arrivent epic par epic. Suis l'avancement sur le tableau de projet GitHub.
+
+## Démarrage rapide (sans terminal)
+
+1. Cliquer sur **Deploy to Vercel** (lien ajouté à la première version).
+2. Ouvrir ton nouveau site : la page **/setup** te guide pour Supabase, Firebase et les clés à
+   coller dans Vercel, en vérifiant chacune en direct.
+   Étapes détaillées : [docs/install.md](docs/install.md).
+3. Renseigner vos prénoms, la date de début et la couleur. Terminé.
+4. Android : télécharger l'APK depuis Releases, ouvrir **Réglages** sur le web, scanner le QR code.
 
 ## Fonctionnalités (v1)
 
@@ -55,14 +89,18 @@ installation Docker/VPS, locale anglaise.
 | Android | Kotlin + Jetpack Compose Material 3 + Ktor |
 | Outillage | pnpm, TypeScript 7, Vitest, Playwright, Oxlint, Oxfmt, dependency-cruiser, knip, ktlint |
 
-## Démarrage rapide (sans terminal)
+## Démarrage développeur
 
-1. Cliquer sur **Deploy to Vercel** (lien ajouté à la première version).
-2. Ouvrir ton nouveau site : la page **/setup** te guide pour Supabase, Firebase et les clés à
-   coller dans Vercel, en vérifiant chacune en direct.
-   Étapes détaillées : [docs/install.md](docs/install.md).
-3. Renseigner vos prénoms, la date de début et la couleur. Terminé.
-4. Android : télécharger l'APK depuis Releases, ouvrir **Réglages** sur le web, scanner le QR code.
+Prérequis : Node 22.18+, pnpm 10.34.7, JDK et Android SDK pour le mobile, Supabase CLI.
+
+```bash
+cd web
+pnpm install
+cp .env.example .env.local   # puis compléter les variables, voir la page /setup
+pnpm dev                     # -> http://localhost:3000
+```
+
+Android : ouvrir `mobile/` dans Android Studio.
 
 ## Contribuer
 
@@ -70,98 +108,18 @@ Lis d'abord [CONTRIBUTING.md](CONTRIBUTING.md). La participation est régie par 
 [Code de conduite](CODE_OF_CONDUCT.md). Signale les vulnérabilités en privé, voir
 [SECURITY.md](SECURITY.md).
 
+Bug ou idée : ouvrir une [issue](https://github.com/BaptisteLOpenSource/OpenLove/issues).
+
 ## Documentation
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) : structure, règles, correctifs de sécurité
-- [CONTEXT.md](CONTEXT.md) : vocabulaire du domaine
-- [docs/decisions/](docs/decisions/) : décisions d'architecture (ADR)
+- [Installation](docs/install.md) : déploiement pas à pas
+- [Architecture](ARCHITECTURE.md) : structure, règles, correctifs de sécurité
+- [Vocabulaire du domaine](CONTEXT.md) : glossaire
+- [Décisions](docs/decisions/) : décisions d'architecture (ADR)
 - [CONTRIBUTING.md](CONTRIBUTING.md) : comment contribuer
 - [SECURITY.md](SECURITY.md) : comment signaler une vulnérabilité
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) : règles de la communauté
 
 ## Licence
 
-[MIT](LICENSE)
-
----
-
-# OpenLove (English)
-
-[![License: MIT](https://img.shields.io/github/license/BaptisteLeDev/OpenLove)](LICENSE)
-[![Status: pre-code](https://img.shields.io/badge/status-pre--code-lightgrey)](#status)
-[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen)](CONTRIBUTING.md)
-[![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-Contributor%20Covenant-blue)](CODE_OF_CONDUCT.md)
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
-
-> A clean, self-hostable love app for couples: realtime chat, time-locked surprises and letters,
-> shared collections and calendar. Web (PWA) and Android, one instance per couple.
-
-**OpenLove** is the open-source rewrite of a private couple's app. Nothing personal ships: no
-names, no private content, no personal assets. You deploy it, you configure it, it becomes yours.
-
-## About
-
-Built for two people, not for a platform. One instance serves one couple, you own the data
-(your Supabase, your storage), and the reveal of surprises is decided by the server clock so
-nothing can be spoiled from the client.
-
-## Status
-
-Pre-code. Architecture and plan are settled; implementation starts with Epic E0. Follow the
-progress on the GitHub project board.
-
-## Features (v1)
-
-- **Home**: milestone counter, next date countdown, mood of the day
-- **Chat**: realtime messages, typing indicator, read receipts, images, GIFs, shared places
-  (map preview, opens in Google Maps). Text encrypted at rest.
-- **Surprises & letters**: written ahead, revealed by the server clock only (spoiler-proof)
-- **Collections**: places, movies (TMDB), activities, shared between the two partners
-- **Calendar**: special dates, subscribed `.ics` calendars, reminders
-- **Push notifications**: Firebase Cloud Messaging on web and Android, no message content shown
-- **Your photos, your cloud**: media stored in your own Supabase Storage (Google Drive later)
-- **Material 3**: one seed color themes both the web app and the Android app
-- **Android app**: scan a QR code on the web settings page, done
-
-Later: RadioBox (shared YouTube playlists), Chrome extension, Google Drive storage, Docker/VPS
-install, English locale.
-
-## Stack
-
-| Layer | Choice |
-|---|---|
-| Web + API | Next.js (App Router) + TypeScript strict + Tailwind (M3 tokens) + next-intl |
-| Validation | Zod (env, API in/out), exported as JSON contracts for Android |
-| Data | Supabase (Postgres + RLS, Auth, Storage, Realtime) |
-| Push | Firebase Cloud Messaging |
-| Android | Kotlin + Jetpack Compose Material 3 + Ktor |
-| Tooling | pnpm, TypeScript 7, Vitest, Playwright, Oxlint, Oxfmt, dependency-cruiser, knip, ktlint |
-
-## Quick start (no terminal)
-
-1. Click **Deploy to Vercel** (link added at first release).
-2. Open your new site: the **/setup** page walks you through Supabase, Firebase and the keys to
-   paste into Vercel, checking each one live.
-   Step-by-step guide: [docs/install.md](docs/install.md).
-3. Set your names, start date and color. Done.
-4. Android: download the APK from Releases, open **Settings** on the web, scan the QR code.
-
-## Contributing
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) first. Participation is governed by the
-[Code of Conduct](CODE_OF_CONDUCT.md). Report vulnerabilities privately, see [SECURITY.md](SECURITY.md).
-
-## Docs
-
-- [ARCHITECTURE.md](ARCHITECTURE.md): layout, rules, security fixes
-- [CONTEXT.md](CONTEXT.md): domain vocabulary
-- [docs/decisions/](docs/decisions/): architecture decision records
-- [CONTRIBUTING.md](CONTRIBUTING.md): how to contribute
-- [SECURITY.md](SECURITY.md): how to report a vulnerability
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md): community standards
-
-## License
-
-[MIT](LICENSE)
-
+[MIT](LICENSE) © les contributeurs d'OpenLove.

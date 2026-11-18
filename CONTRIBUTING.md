@@ -69,7 +69,7 @@ npx supabase@2.121.0 start && pnpm seed && pnpm e2e
 
 1. **Fork** le dépôt sur GitHub, puis clone ton fork.
 2. **Branche depuis `dev`** dans ton fork, pas depuis `main`.
-3. **Pousse** ta branche sur ton fork et **ouvre une pull request** vers `BaptisteLeDev/OpenLove`, base `dev`.
+3. **Pousse** ta branche sur ton fork et **ouvre une pull request** vers `BaptisteLOpenSource/OpenLove`, base `dev`.
 4. Le mainteneur relit. Il peut te demander des changements. Seul le mainteneur merge.
 
 Tu ne merges jamais ta propre PR, et `dev` n'accepte aucun push direct hormis celui du mainteneur.
@@ -181,7 +181,7 @@ npx supabase@2.121.0 start && pnpm seed && pnpm e2e
 
 1. **Fork** the repository on GitHub, then clone your fork.
 2. **Branch from `dev`** in your fork, not from `main`.
-3. **Push** your branch to your fork and **open a pull request** against `BaptisteLeDev/OpenLove`, base `dev`.
+3. **Push** your branch to your fork and **open a pull request** against `BaptisteLOpenSource/OpenLove`, base `dev`.
 4. The maintainer reviews. You may be asked to change things. Only the maintainer merges.
 
 Your PR is never merged by you, and `dev` accepts no direct push from anyone but the maintainer.

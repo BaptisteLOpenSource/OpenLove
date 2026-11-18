@@ -15,7 +15,7 @@ listera les versions supportées.
 
 Signaler en privé via le formulaire d'avis de sécurité GitHub :
 
-👉 <https://github.com/BaptisteLeDev/OpenLove/security/advisories/new>
+👉 <https://github.com/BaptisteLOpenSource/OpenLove/security/advisories/new>
 
 Indiquer :
 
@@ -69,7 +69,7 @@ versions.
 
 Report it privately through GitHub's security advisory form:
 
-👉 <https://github.com/BaptisteLeDev/OpenLove/security/advisories/new>
+👉 <https://github.com/BaptisteLOpenSource/OpenLove/security/advisories/new>
 
 Include:
 
