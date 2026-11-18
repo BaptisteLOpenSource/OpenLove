@@ -18,3 +18,8 @@ Chat between the two Partenaires of a Couple.
   AES-256-GCM before insert ([ADR 0010](../../../../docs/decisions/0010-message-encryption-at-rest.md)).
   RLS: read and insert scoped to `private.my_couple_id()`, insert needs `author_id = auth.uid()`.
   No update/delete grant.
+- Own id: `/api/messages` returns `me` (caller's Partenaire id). Clients never decode the JWT.
+- Known duplicate: `ui/merge.ts` (`mergeMessages`, `seenId`) has a Kotlin twin in
+  `mobile/androidApp/.../chat/ChatModel.kt`. Two languages, no shared code path: keep both in step.
+- Known limit: `partnerReadId` reads the one `message_reads` row of the other Partenaire with
+  `maybeSingle()`. Holds while a Couple has exactly 2 members; a 3rd would make the read fail (500).

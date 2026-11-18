@@ -74,6 +74,7 @@ export async function listMessages(
     items: page.flatMap(readable),
     nextCursor: data.length > limit ? String(page[page.length - 1]?.id) : null,
     partnerReadId: read ? String(read.last_read_id) : null,
+    me: userId,
   };
 }
 

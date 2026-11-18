@@ -64,13 +64,13 @@ class ChatModelTest {
     private fun page(
         next: String?,
         vararg ids: String,
-    ) = """{"items":[${ids.joinToString(",") { msg(it) }}],"nextCursor":${next?.let { "\"$it\"" }},"partnerReadId":null}"""
+    ) = """{"items":[${ids.joinToString(",") { msg(it) }}],"nextCursor":${next?.let { "\"$it\"" }},"partnerReadId":null,"me":"me"}"""
 
     @Test
     fun seenIsLastOwnMessageReadByPartner() =
         runTest {
             pages["GET /api/messages"] =
-                """{"items":[${msg("9", "me")},${msg("10")},${msg("11", "me")}],"nextCursor":null,"partnerReadId":"10"}"""
+                """{"items":[${msg("9", "me")},${msg("10")},${msg("11", "me")}],"nextCursor":null,"partnerReadId":"10","me":"me"}"""
             val chat = model()
             chat.refresh()
             val s = chat.state.value

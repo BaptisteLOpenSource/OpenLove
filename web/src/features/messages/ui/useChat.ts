@@ -11,6 +11,7 @@ import { type Message, mergeMessages } from "./merge";
 type Page = z.input<typeof messagesResponse>;
 
 const TYPING_SHOWN_MS = 5_000;
+const SYNC_DEBOUNCE_MS = 1_000;
 const TYPING_THROTTLE_MS = 2_000;
 
 // Only place that calls /api/messages from the browser.
@@ -30,7 +31,7 @@ export function useChat(initial: Page, coupleId: string) {
   const loadOlder = async () => {
     if (!nextCursor) return;
     try {
-      const page = await api<Page>(`/api/messages?cursor=${nextCursor}`);
+      const page = await api<Page>(`/api/messages?cursor=${encodeURIComponent(nextCursor)}`);
       setItems((prev) => mergeMessages(page.items, prev));
       setNextCursor(page.nextCursor);
     } catch {
@@ -50,6 +51,7 @@ export function useChat(initial: Page, coupleId: string) {
   const typingTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const lastTypingSent = useRef(0);
   const channelRef = useRef<RealtimeChannel | undefined>(undefined);
+  const syncTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     // Signals hold ids only, so every event refetches. A read event must not mark read
@@ -60,11 +62,16 @@ export function useChat(initial: Page, coupleId: string) {
         .then(refresh)
         .catch(() => setFailed(true));
     };
+    // Burst of messages -> one mark-read + refetch, not one per message.
+    const syncSoon = () => {
+      clearTimeout(syncTimer.current);
+      syncTimer.current = setTimeout(sync, SYNC_DEBOUNCE_MS);
+    };
     const pull = () => refresh().catch(() => setFailed(true));
     const sb = browserClient();
     const channel = sb
       .channel(`couple:${coupleId}`, { config: { private: true } })
-      .on("broadcast", { event: "message" }, sync)
+      .on("broadcast", { event: "message" }, syncSoon)
       .on("broadcast", { event: "read" }, pull)
       .on("broadcast", { event: "typing" }, () => {
         setTyping(true);
@@ -81,6 +88,7 @@ export function useChat(initial: Page, coupleId: string) {
     return () => {
       document.removeEventListener("visibilitychange", sync);
       clearTimeout(typingTimer.current);
+      clearTimeout(syncTimer.current);
       void sb.removeChannel(channel);
     };
   }, [coupleId]);

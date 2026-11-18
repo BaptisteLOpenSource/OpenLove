@@ -219,20 +219,11 @@ class OpenLoveClientTest {
             val c =
                 client(paired) {
                     urls += it.url.toString()
-                    reply(HttpStatusCode.OK, """{"data":{"items":[],"nextCursor":null,"partnerReadId":null}}""")
+                    reply(HttpStatusCode.OK, """{"data":{"items":[],"nextCursor":null,"partnerReadId":null,"me":"me"}}""")
                 }
             c.messages()
             c.messages("42")
             assertEquals(listOf("$BASE/api/messages", "$BASE/api/messages?cursor=42"), urls)
-        }
-
-    @Test
-    fun myUserIdReadsJwtSub() =
-        runTest {
-            // payload = {"sub":"me"}
-            val c =
-                client(FakeSessionStore(StoredSession(BASE, Session("h.eyJzdWIiOiJtZSJ9.s", "r", 100)))) { reply(HttpStatusCode.OK, HOME) }
-            assertEquals("me", c.myUserId())
         }
 
     @Test

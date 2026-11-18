@@ -14,7 +14,7 @@ export default async function MessagesPage() {
   return (
     <main className="flex min-h-dvh flex-col items-center gap-4 p-6">
       <h1 className="text-title-medium">{t("title")}</h1>
-      <Chat initial={initial} me={result.partner.userId} coupleId={result.partner.coupleId} />
+      <Chat initial={initial} coupleId={result.partner.coupleId} />
     </main>
   );
 }
