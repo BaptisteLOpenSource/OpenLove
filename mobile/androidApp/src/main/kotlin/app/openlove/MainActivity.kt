@@ -69,7 +69,13 @@ private fun Content(
                 onOpenChat = model::openChat,
                 onSetMood = { mood -> scope.launch { model.setMood(mood) } },
             )
-        is Screen.Chat -> ChatScreen(screen.chat, onBack = model::back)
+        is Screen.Chat ->
+            ChatScreen(
+                screen.chat,
+                mood = screen.home.home.mood.mine,
+                onBack = model::back,
+                onSetMood = { mood -> scope.launch { model.setMood(mood) } },
+            )
         Screen.Unreachable ->
             Centered {
                 Text(stringResource(R.string.error_unreachable))

@@ -33,6 +33,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -211,6 +212,18 @@ class AppModelTest {
             model.setMood("sad")
             assertEquals(listOf("""{"mood":"sad"}"""), moodBodies)
             assertEquals(Screen.Home(homeFixture), model.screen.value)
+            scope.cancelAndJoin()
+        }
+
+    @Test
+    fun setMoodFromChatStaysInChat() =
+        runTest {
+            val model = newModel()
+            model.pair(link)
+            model.openChat()
+            model.setMood("calm")
+            assertEquals(listOf("""{"mood":"calm"}"""), moodBodies)
+            assertTrue(model.screen.value is Screen.Chat)
             scope.cancelAndJoin()
         }
 

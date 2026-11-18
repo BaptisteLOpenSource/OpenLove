@@ -15,6 +15,7 @@ const home = {
   milestone: { years: 0, months: 0, days: 0, totalDays: 0 },
   upcomingDate: null,
   mood: { mine: null, partner: null },
+  moodHistory: [],
 };
 
 vi.mock("server-only", () => ({}));

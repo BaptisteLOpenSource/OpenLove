@@ -3,10 +3,15 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { MoodValue } from "@/shared/contracts/home";
 
 import { type Milestone, milestone, todayIn } from "../domain/milestone";
-import { type Mood, moodOf } from "../domain/mood";
+import { daysBefore, HISTORY_DAYS, type Mood, type MoodDay, moods } from "../domain/mood";
 import { type UpcomingDate, upcomingDate } from "../domain/upcomingDate";
 
-export type Home = { milestone: Milestone; upcomingDate: UpcomingDate | null; mood: Mood };
+export type Home = {
+  milestone: Milestone;
+  upcomingDate: UpcomingDate | null;
+  mood: Mood;
+  moodHistory: MoodDay[];
+};
 
 // RLS hides other partner's private dates, not filtered here.
 export async function getHome(
@@ -24,16 +29,16 @@ export async function getHome(
   const dates = await sb.from("special_dates").select("label, date").eq("couple_id", coupleId);
   if (dates.error) throw dates.error;
   const today = todayIn(couple.data.time_zone, now);
-  const moods = await sb
+  const rows = await sb
     .from("moods")
-    .select("partner_id, mood")
+    .select("partner_id, mood, day")
     .eq("couple_id", coupleId)
-    .eq("day", today);
-  if (moods.error) throw moods.error;
+    .gte("day", daysBefore(today, HISTORY_DAYS));
+  if (rows.error) throw rows.error;
   return {
     milestone: milestone(couple.data.start_date, today),
     upcomingDate: upcomingDate(dates.data, today),
-    mood: moodOf(moods.data, userId),
+    ...moods(rows.data, userId, today),
   };
 }
 

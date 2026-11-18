@@ -13,15 +13,16 @@ const dates = vi.fn(async () => ({
 }));
 const moods = vi.fn(async () => ({
   data: [
-    { partner_id: "u1", mood: "happy" },
-    { partner_id: "u2", mood: "calm" },
+    { partner_id: "u1", mood: "happy", day: "2026-10-19" },
+    { partner_id: "u2", mood: "calm", day: "2026-10-19" },
+    { partner_id: "u2", mood: "sad", day: "2026-10-18" },
   ],
   error: null,
 }));
 const upsert = vi.fn(async () => ({ error: null }));
 const from = vi.fn((table: string) => {
   if (table === "couples") return { select: () => ({ eq: () => ({ single: couple }) }) };
-  if (table === "moods") return { select: () => ({ eq: () => ({ eq: moods }) }), upsert };
+  if (table === "moods") return { select: () => ({ eq: () => ({ gte: moods }) }), upsert };
   return { select: () => ({ eq: dates }) };
 });
 const sb = { from } as unknown as SupabaseClient;
@@ -37,6 +38,7 @@ test("reads Couple, special dates and today's moods, counts in the Couple time z
     inDays: 6,
   });
   expect(home.mood).toEqual({ mine: "happy", partner: "calm" });
+  expect(home.moodHistory[0]).toEqual({ day: "2026-10-18", mine: null, partner: "sad" });
 });
 
 test("special_dates error -> rejects", async () => {

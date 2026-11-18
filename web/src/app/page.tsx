@@ -7,6 +7,7 @@ import { getHome, getPartnerNames } from "@/features/home/server/getHome";
 import { setMoodAction } from "@/features/home/server/moodAction";
 import { Milestone } from "@/features/home/ui/Milestone";
 import { Mood } from "@/features/home/ui/Mood";
+import { MoodBanner } from "@/features/home/ui/MoodBanner";
 import { UpcomingDate } from "@/features/home/ui/UpcomingDate";
 import { partnerOf, serverClient } from "@/shared/supabase/server";
 
@@ -21,10 +22,11 @@ export default async function HomePage() {
   ]);
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 p-6">
+      {home.mood.mine === null && <MoodBanner action={setMoodAction} />}
       <h1 className="text-headline-large">{t("partners", names)}</h1>
       <Milestone value={home.milestone} />
       <UpcomingDate value={home.upcomingDate} />
-      <Mood value={home.mood} action={setMoodAction} />
+      <Mood value={home.mood} history={home.moodHistory} action={setMoodAction} />
       <Link href="/messages" className="rounded-full border px-4 py-2">
         {t("messages")}
       </Link>

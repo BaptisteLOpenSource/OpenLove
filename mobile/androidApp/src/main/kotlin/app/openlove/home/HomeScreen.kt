@@ -2,12 +2,10 @@ package app.openlove.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,7 +14,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.openlove.R
 import app.openlove.core.api.HomeResponse
-import app.openlove.core.api.MOODS
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
@@ -29,10 +29,19 @@ fun HomeScreen(
         Text(stringResource(R.string.mood_title), style = MaterialTheme.typography.titleMedium)
         Text(stringResource(R.string.mood_mine, moodLabel(home.mood.mine)))
         Text(stringResource(R.string.mood_partner, moodLabel(home.mood.partner)))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            MOODS.forEach { mood ->
-                OutlinedButton(onClick = { onSetMood(mood) }) { Text(moodLabel(mood)) }
-            }
+        MoodPicker(home.mood.mine, onSetMood)
+        Text(stringResource(R.string.mood_history_title), style = MaterialTheme.typography.titleSmall)
+        home.moodHistory.forEach { d ->
+            val day = LocalDate.parse(d.day).format(DAY_FORMAT)
+            val none = stringResource(R.string.mood_history_none)
+            Text(
+                stringResource(
+                    R.string.mood_history_line,
+                    day,
+                    d.mine?.let { moodLabel(it) } ?: none,
+                    d.partner?.let { moodLabel(it) } ?: none,
+                ),
+            )
         }
         Text(stringResource(R.string.home_milestone_title), style = MaterialTheme.typography.titleMedium)
         val total = home.milestone.totalDays
@@ -55,13 +64,4 @@ fun HomeScreen(
     }
 }
 
-@Composable
-private fun moodLabel(mood: String?): String =
-    when (mood) {
-        "happy" -> stringResource(R.string.mood_happy)
-        "calm" -> stringResource(R.string.mood_calm)
-        "tired" -> stringResource(R.string.mood_tired)
-        "sad" -> stringResource(R.string.mood_sad)
-        "anxious" -> stringResource(R.string.mood_anxious)
-        else -> stringResource(R.string.mood_none)
-    }
+private val DAY_FORMAT = DateTimeFormatter.ofPattern("EEE d MMM", Locale.FRENCH)

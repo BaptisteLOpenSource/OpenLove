@@ -15,7 +15,14 @@
       "mood": {
         "mine": "happy",
         "partner": "calm"
-      }
+      },
+      "moodHistory": [
+        {
+          "day": "2026-10-29",
+          "mine": "tired",
+          "partner": null
+        }
+      ]
     },
     {
       "milestone": {
@@ -28,7 +35,8 @@
       "mood": {
         "mine": null,
         "partner": null
-      }
+      },
+      "moodHistory": []
     }
   ],
   "invalid": [
@@ -56,7 +64,14 @@
       "mood": {
         "mine": "happy",
         "partner": "calm"
-      }
+      },
+      "moodHistory": [
+        {
+          "day": "2026-10-29",
+          "mine": "tired",
+          "partner": null
+        }
+      ]
     },
     {
       "milestone": {
@@ -73,7 +88,14 @@
       "mood": {
         "mine": "happy",
         "partner": "calm"
-      }
+      },
+      "moodHistory": [
+        {
+          "day": "2026-10-29",
+          "mine": "tired",
+          "partner": null
+        }
+      ]
     },
     {
       "milestone": {
@@ -90,7 +112,14 @@
       "mood": {
         "mine": "happy",
         "partner": "calm"
-      }
+      },
+      "moodHistory": [
+        {
+          "day": "2026-10-29",
+          "mine": "tired",
+          "partner": null
+        }
+      ]
     },
     {
       "milestone": {
@@ -107,7 +136,14 @@
       "mood": {
         "mine": "angry",
         "partner": null
-      }
+      },
+      "moodHistory": [
+        {
+          "day": "2026-10-29",
+          "mine": "tired",
+          "partner": null
+        }
+      ]
     },
     {
       "milestone": {
@@ -123,7 +159,38 @@
       },
       "mood": {
         "mine": "happy"
-      }
+      },
+      "moodHistory": [
+        {
+          "day": "2026-10-29",
+          "mine": "tired",
+          "partner": null
+        }
+      ]
+    },
+    {
+      "milestone": {
+        "years": 1,
+        "months": 2,
+        "days": 3,
+        "totalDays": 430
+      },
+      "upcomingDate": {
+        "label": "Anniversaire",
+        "date": "2026-11-05",
+        "inDays": 6
+      },
+      "mood": {
+        "mine": "happy",
+        "partner": "calm"
+      },
+      "moodHistory": [
+        {
+          "day": "29/10/2026",
+          "mine": null,
+          "partner": null
+        }
+      ]
     }
   ]
 }
