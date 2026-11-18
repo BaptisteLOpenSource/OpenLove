@@ -1,12 +1,14 @@
 import "server-only";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { NextRequest, NextResponse } from "next/server";
 
 import { env } from "@/shared/env";
 
-export type Partner = { userId: string; coupleId: string; role: "partner_a" | "partner_b" };
+import { type PartnerRole, roleOf } from "./role";
+
+export type Partner = { userId: string; coupleId: string; role: PartnerRole };
 export type PartnerResult =
   | { ok: true; partner: Partner }
   | { ok: false; code: "unauthorized" | "not_couple_member" };
@@ -31,18 +33,17 @@ export async function serverClient(bearer?: string): Promise<SupabaseClient> {
 export async function partnerOf(sb: SupabaseClient, jwt?: string): Promise<PartnerResult> {
   const { data: auth, error: authError } = await sb.auth.getUser(jwt);
   if (authError || !auth.user) return { ok: false, code: "unauthorized" };
+  const role = roleOf(auth.user);
+  if (!role) return { ok: false, code: "unauthorized" };
+  // Data access only: the role comes from the claim, membership only yields the Couple.
   const { data, error } = await sb
     .from("couple_members")
-    .select("couple_id, role")
+    .select("couple_id")
     .eq("user_id", auth.user.id)
     .maybeSingle();
   if (error) throw error;
   if (!data) return { ok: false, code: "not_couple_member" };
-  return { ok: true, partner: { userId: auth.user.id, coupleId: data.couple_id, role: data.role } };
-}
-
-export async function getPartner(bearer?: string): Promise<PartnerResult> {
-  return partnerOf(await serverClient(bearer), bearer);
+  return { ok: true, partner: { userId: auth.user.id, coupleId: data.couple_id, role } };
 }
 
 // Refreshed cookies go on req (seen by this render) and on the response.
@@ -65,4 +66,19 @@ export function proxyClient(req: NextRequest) {
     return res;
   };
   return { sb, respond };
+}
+
+// Service role bypasses RLS: callers re-check authorization.
+let admin: SupabaseClient | undefined;
+export function adminClient(): SupabaseClient {
+  return (admin ??= createClient(env().SUPABASE_URL, env().SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false },
+  }));
+}
+
+// Per call, no stored session: mints a session handed to the caller.
+export function anonClient(): SupabaseClient {
+  return createClient(env().SUPABASE_URL, env().SUPABASE_ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }

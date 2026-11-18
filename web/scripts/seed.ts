@@ -8,6 +8,9 @@ export const SEED = {
     stranger: "stranger@example.com",
   },
   startDate: "2020-02-14",
+  names: { a: "Alex", b: "Sam" },
+  seed: "#8f3f5a",
+  specialDates: { shared: "Anniversaire de rencontre", private: "Surprise de partner_b" },
 } as const;
 
 export function localAdmin(
@@ -38,25 +41,47 @@ export async function ensureUser(admin: SupabaseClient, email: string): Promise<
 export async function seed(admin: SupabaseClient): Promise<{ coupleId: string }> {
   const a = await ensureUser(admin, SEED.emails.a);
   const b = await ensureUser(admin, SEED.emails.b);
-  await ensureUser(admin, SEED.emails.stranger);
+  const stranger = await ensureUser(admin, SEED.emails.stranger);
+  // Forged user-editable claim: must not authorize (role lives in app_metadata only).
+  const forged = await admin.auth.admin.updateUserById(stranger, {
+    user_metadata: { role: "partner_a", pseudo: "partner_a" },
+  });
+  if (forged.error) throw forged.error;
 
   const existing = await admin.from("couple_members").select("couple_id").eq("user_id", a);
   if (existing.error) throw existing.error;
+  const branding = {
+    partner_a_name: SEED.names.a,
+    partner_b_name: SEED.names.b,
+    seed: SEED.seed,
+  };
   let coupleId: string | undefined = existing.data[0]?.couple_id;
   if (!coupleId) {
     const couple = await admin
       .from("couples")
-      .insert({ start_date: SEED.startDate })
+      .insert({ ...branding, start_date: SEED.startDate })
       .select("id")
       .single();
     if (couple.error) throw couple.error;
     coupleId = couple.data.id as string;
+  } else {
+    const updated = await admin.from("couples").update(branding).eq("id", coupleId);
+    if (updated.error) throw updated.error;
   }
   const members = await admin.from("couple_members").upsert([
     { user_id: a, couple_id: coupleId, role: "partner_a" },
     { user_id: b, couple_id: coupleId, role: "partner_b" },
   ]);
   if (members.error) throw members.error;
+
+  const inDays = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString().slice(0, 10);
+  const deleted = await admin.from("special_dates").delete().eq("couple_id", coupleId);
+  if (deleted.error) throw deleted.error;
+  const dates = await admin.from("special_dates").insert([
+    { couple_id: coupleId, label: SEED.specialDates.shared, date: inDays(10) },
+    { couple_id: coupleId, label: SEED.specialDates.private, date: inDays(5), private_to: b },
+  ]);
+  if (dates.error) throw dates.error;
   return { coupleId };
 }
 

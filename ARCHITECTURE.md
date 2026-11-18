@@ -11,7 +11,7 @@ Vocabulary: [`CONTEXT.md`](CONTEXT.md).
                             ├──> /api/* (Next.js route handlers) ──> Supabase (Postgres, Auth, Storage, Realtime)
  Android (Compose) ─Bearer──┘            │                      ──> FCM (push web + Android)
                                          └──> TMDB, Nominatim, GIF provider (one client each)
- Web only: Supabase Realtime signals (new message id, typing), user JWT, RLS-scoped; content refetched via /api/chat.
+ Web only: Supabase Realtime signals (new message id, typing), user JWT, RLS-scoped; content refetched via /api/messages.
 ```
 
 - Android never talks to Supabase: `/api` is the only door ([ADR 0001](docs/decisions/0001-monorepo-api-only-backend.md)).
@@ -33,8 +33,8 @@ web/
     env.ts                      ONE Zod env schema (also drives /setup checklist)
     ui/                         M3 primitives (Button, Card, TextField, Chip, Dialog...)
     i18n/                       next-intl, messages/fr.json
-android/                        app/ (screens per feature), core/ (api client, auth, theme)
-contracts/                      generated fixtures, decoded by Android contract tests
+mobile/                         shared/ (KMP: Ktor client, DTOs, Json, SQLDelight), androidApp/ (Compose screens, DI, theme)
+contracts/                      generated fixtures, decoded by mobile contract tests (`shared/commonTest`)
 design/tokens.json              typography, shape, default seed; scheme at runtime via `/api/theme`
 supabase/migrations/            SQL, RLS on every table
 ```
@@ -55,10 +55,11 @@ Business rule needing a DB to test = rule leaked out of `domain/`.
 
 ## 4. API conventions
 
-- `withContract({input?, output, auth: 'partner' | 'cron' | 'public'}, handler)`.
+- `withContract({input?, output, auth: 'partner' | 'public'}, handler)`.
 - Envelope `{data: T} | {error: {code, message}}`, codes `unauthorized | forbidden |
   not_couple_member | validation_failed | not_found | rate_limited | unavailable | internal`,
-  semantic HTTP status (`not_couple_member` = 403: valid session, no Couple).
+  semantic HTTP status (`not_couple_member` = 403, only in a race: removing a membership strips
+  the role claim, so the call answers 401 `unauthorized`, ADR 0011).
 - Pagination: cursor `{items, nextCursor}` on chat messages only (cap 100, default 50).
 - No versioning: `/api/*` = v1. Contracts are the compatibility promise to Android: a breaking
   schema change fails the Android contract test.
@@ -71,14 +72,15 @@ Business rule needing a DB to test = rule leaked out of `domain/`.
 | Push | FCM for web and Android, one `notify(recipient, payload)` | [0004](docs/decisions/0004-fcm-single-push-provider.md) |
 | Mobile login | QR pairing from `/settings` (instance URL + one-time code), manual fallback | [0005](docs/decisions/0005-qr-pairing-mobile.md) |
 | Media | `MediaStore` port: Supabase Storage (private bucket, signed URLs); Google Drive later | [0006](docs/decisions/0006-mediastore-port.md) |
-| Chat realtime | Web: Supabase Realtime signal only (message id, no content), refetch via `/api/chat`. Android: FCM wake + fetch, 3 s polling while chat open | [0001](docs/decisions/0001-monorepo-api-only-backend.md) |
-| Couple bootstrap | First run `/setup` creates partner_a + Couple; one-time invite link for partner_b (TTL, single use, rate limited); then public signup closed | - |
+| Chat realtime | Web: Supabase Realtime signal only (message id, no content), refetch via `/api/messages`. Android: FCM wake + fetch, 3 s polling while chat open | [0001](docs/decisions/0001-monorepo-api-only-backend.md) |
+| Couple bootstrap | First run `/setup` creates partner_a + Couple (`create_couple`, service role); partner_b invite link (TTL, single use, rate limited) deferred to a follow-up issue (after #11); public signup closed | - |
 | Chat crypto | AES-256-GCM at rest, server key. Documented as at-rest, NOT E2E | - |
 | Config | One Zod env schema; `/setup` renders checklist (Vercel, Supabase, Firebase, keys) | - |
 | i18n | next-intl / `strings.xml`, FR only in v1 | - |
 | Deploy | Vercel button (v1). Docker/VPS after all features + UX | - |
 | Toolchain | TS 7, Oxlint (type-aware + security jsPlugins), Oxfmt, React Compiler, ktlint | [0007](docs/decisions/0007-toolchain.md) |
 | Android JSON | Prod ignores unknown keys (old APKs survive new fields); contract tests strict | [0008](docs/decisions/0008-android-json-tolerant-prod.md) |
+| Mobile core | KMP `mobile/shared` (Ktor, DTOs, Json, cache, session); native UI per platform (Compose / SwiftUI) | [0009](docs/decisions/0009-kmp-shared-mobile-core.md) |
 
 ## 6. Security fixes carried from the source audit
 

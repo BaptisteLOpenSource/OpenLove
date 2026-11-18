@@ -42,7 +42,7 @@ Prérequis : Node.js LTS, pnpm, JDK 17+ et Android Studio (Android uniquement), 
 ```bash
 npx supabase@2.121.0 start          # Postgres, Auth, Storage en local (Docker)
 cd web && pnpm install && pnpm dev
-cd android && ./gradlew testDebugUnitTest lintDebug ktlintCheck
+cd mobile && ./gradlew :shared:allTests :androidApp:testDebugUnitTest :androidApp:lintDebug ktlintCheck
 ```
 
 Supabase local : migrations dans `supabase/migrations/`, appliquées par `start` et
@@ -69,7 +69,7 @@ npx supabase@2.121.0 start && pnpm seed && pnpm e2e
 
 1. **Fork** le dépôt sur GitHub, puis clone ton fork.
 2. **Branche depuis `dev`** dans ton fork, pas depuis `main`.
-3. **Pousse** ta branche sur ton fork et **ouvre une pull request** vers `BaptisteLeDev/OpenLove`, base `dev`.
+3. **Pousse** ta branche sur ton fork et **ouvre une pull request** vers `BaptisteLOpenSource/OpenLove`, base `dev`.
 4. Le mainteneur relit. Il peut te demander des changements. Seul le mainteneur merge.
 
 Tu ne merges jamais ta propre PR, et `dev` n'accepte aucun push direct hormis celui du mainteneur.
@@ -93,7 +93,7 @@ nouveaux contributeurs).
 4. **Ouvre une PR en brouillon** vers `dev`. Brouillon = « In Review ». Passe-la en prête quand les
    checks sont verts.
 5. **Checks verts** : `pnpm type-check && pnpm lint && pnpm test && pnpm arch-test && pnpm knip` (web),
-   `testDebugUnitTest` (Android). Ajoute des tests pour chaque règle touchée.
+   `:shared:allTests :androidApp:testDebugUnitTest` (mobile). Ajoute des tests pour chaque règle touchée.
 6. **Revue** : au moins une approbation d'un mainteneur. Les changements sensibles (auth, API, accès
    aux données, saisie utilisateur) demandent aussi une revue sécurité avant merge.
 
@@ -154,7 +154,7 @@ Prerequisites: Node.js LTS, pnpm, JDK 17+ and Android Studio (Android only), Doc
 ```bash
 npx supabase@2.121.0 start          # local Postgres, Auth, Storage (Docker)
 cd web && pnpm install && pnpm dev
-cd android && ./gradlew testDebugUnitTest lintDebug ktlintCheck
+cd mobile && ./gradlew :shared:allTests :androidApp:testDebugUnitTest :androidApp:lintDebug ktlintCheck
 ```
 
 Local Supabase: migrations live in `supabase/migrations/`, applied by `start` and
@@ -181,7 +181,7 @@ npx supabase@2.121.0 start && pnpm seed && pnpm e2e
 
 1. **Fork** the repository on GitHub, then clone your fork.
 2. **Branch from `dev`** in your fork, not from `main`.
-3. **Push** your branch to your fork and **open a pull request** against `BaptisteLeDev/OpenLove`, base `dev`.
+3. **Push** your branch to your fork and **open a pull request** against `BaptisteLOpenSource/OpenLove`, base `dev`.
 4. The maintainer reviews. You may be asked to change things. Only the maintainer merges.
 
 Your PR is never merged by you, and `dev` accepts no direct push from anyone but the maintainer.
@@ -203,7 +203,7 @@ The first CI run on a fork PR waits for maintainer approval (GitHub default for 
    Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `ci`, `perf`.
 4. **Open a draft PR** against `dev`. Draft = "In Review". Mark it ready when checks pass.
 5. **Checks must be green**: `pnpm type-check && pnpm lint && pnpm test && pnpm arch-test && pnpm knip` (web),
-   `testDebugUnitTest` (Android). Add tests for every rule you touch.
+   `:shared:allTests :androidApp:testDebugUnitTest` (mobile). Add tests for every rule you touch.
 6. **Review**: at least one maintainer approval. Security-sensitive changes (auth, API, data access,
    user input) also get a security review before merge.
 

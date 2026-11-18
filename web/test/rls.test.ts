@@ -3,9 +3,12 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { beforeAll, describe, expect, test } from "vitest";
 
 import { ensureUser, localAdmin, SEED, seed } from "../scripts/seed";
+import { encrypt } from "../src/features/messages/server/crypto";
 
 const url = process.env.SUPABASE_URL ?? "";
 const anonKey = process.env.SUPABASE_ANON_KEY ?? "";
+// Valid ciphertext: parallel files list this table and decrypt every row.
+const blob = () => encrypt(Buffer.from(process.env.MESSAGE_ENCRYPTION_KEY ?? "", "base64"), "rls");
 const OTHER = "other@example.com";
 
 const up =
@@ -33,7 +36,16 @@ async function otherCouple(admin: SupabaseClient): Promise<string> {
   const userId = await ensureUser(admin, OTHER);
   const member = await admin.from("couple_members").select("couple_id").eq("user_id", userId);
   if (member.data?.[0]) return member.data[0].couple_id;
-  const couple = await admin.from("couples").insert({ start_date: "2021-06-01" }).select().single();
+  const couple = await admin
+    .from("couples")
+    .insert({
+      start_date: "2021-06-01",
+      partner_a_name: "Robin",
+      partner_b_name: "Jo",
+      seed: "#4f6f8a",
+    })
+    .select()
+    .single();
   if (couple.error) throw couple.error;
   const ins = await admin
     .from("couple_members")
@@ -110,5 +122,75 @@ describe.skipIf(!up)("couple RLS", () => {
       .eq("user_id", me.user?.id ?? "")
       .single();
     expect(row.data?.role).toBe("partner_a");
+  });
+
+  test("messages: stranger reads 0 rows and cannot insert", async () => {
+    const admin = localAdmin();
+    const { coupleId } = await seed(admin);
+    const a = await signedIn(SEED.emails.a);
+    const { data: me } = await a.auth.getUser();
+    const own = await a
+      .from("messages")
+      .insert({ couple_id: coupleId, author_id: me.user?.id, body_enc: blob() });
+    expect(own.error).toBeNull();
+
+    const s = await signedIn(SEED.emails.stranger);
+    const { data: who } = await s.auth.getUser();
+    expect((await s.from("messages").select()).data).toEqual([]);
+    const ins = await s
+      .from("messages")
+      .insert({ couple_id: coupleId, author_id: who.user?.id, body_enc: blob() });
+    expect(ins.error).not.toBeNull();
+    expect((await anon().from("messages").select()).data ?? []).toEqual([]);
+  });
+
+  test("messages: partner cannot forge the author or write into another couple", async () => {
+    const a = await signedIn(SEED.emails.a);
+    const { coupleId } = await seed(localAdmin());
+    const b = await localAdmin().from("couple_members").select("user_id").eq("role", "partner_b");
+    const forged = await a
+      .from("messages")
+      .insert({ couple_id: coupleId, author_id: b.data?.[0]?.user_id, body_enc: blob() });
+    expect(forged.error).not.toBeNull();
+    const { data: me } = await a.auth.getUser();
+    const foreign = await a
+      .from("messages")
+      .insert({ couple_id: otherCoupleId, author_id: me.user?.id, body_enc: blob() });
+    expect(foreign.error).not.toBeNull();
+  });
+});
+
+describe.skipIf(!up)("special dates RLS", () => {
+  let coupleId = "";
+
+  beforeAll(async () => {
+    ({ coupleId } = await seed(localAdmin()));
+  });
+
+  test("partner_a does not see partner_b private date", async () => {
+    const a = await signedIn(SEED.emails.a);
+    const { data } = await a.from("special_dates").select("label");
+    const labels = data?.map((d) => d.label) ?? [];
+    expect(labels).toContain(SEED.specialDates.shared);
+    expect(labels).not.toContain(SEED.specialDates.private);
+  });
+
+  test("partner_b sees own private date", async () => {
+    const b = await signedIn(SEED.emails.b);
+    const { data } = await b.from("special_dates").select("label");
+    expect(data?.map((d) => d.label)).toContain(SEED.specialDates.private);
+  });
+
+  test("stranger sees no special dates", async () => {
+    const s = await signedIn(SEED.emails.stranger);
+    expect((await s.from("special_dates").select()).data).toEqual([]);
+  });
+
+  test("partner_a cannot insert a special date", async () => {
+    const a = await signedIn(SEED.emails.a);
+    const { error } = await a
+      .from("special_dates")
+      .insert({ couple_id: coupleId, label: "Hack", date: "2030-01-01" });
+    expect(error).not.toBeNull();
   });
 });

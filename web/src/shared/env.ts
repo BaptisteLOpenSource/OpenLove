@@ -1,12 +1,38 @@
 import { z } from "zod";
 
+declare module "zod" {
+  interface GlobalMeta {
+    docUrl?: string;
+  }
+}
+
+// Wiki and presentation page: GitHub Pages on the author's domain (site/).
+const WIKI_URL = "https://openlove.baptisteledev.fr/wiki";
+const guide = (anchor: string) => `${WIKI_URL}/installer/#${anchor}`;
+
 export const envSchema = z.object({
-  SUPABASE_URL: z.url(),
-  SUPABASE_ANON_KEY: z.string().min(1),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  CRON_SECRET: z.string().min(16),
-  NEXT_PUBLIC_SUPABASE_URL: z.url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  SUPABASE_URL: z.url().meta({ docUrl: guide("supabase_url") }),
+  SUPABASE_ANON_KEY: z
+    .string()
+    .min(1)
+    .meta({ docUrl: guide("supabase_anon_key") }),
+  SUPABASE_SERVICE_ROLE_KEY: z
+    .string()
+    .min(1)
+    .meta({ docUrl: guide("supabase_service_role_key") }),
+  NEXT_PUBLIC_SUPABASE_URL: z.url().meta({ docUrl: guide("next_public_supabase_url") }),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z
+    .string()
+    .min(1)
+    .meta({ docUrl: guide("next_public_supabase_anon_key") }),
+  MESSAGE_ENCRYPTION_KEY: z
+    .base64()
+    .refine((v) => Buffer.from(v, "base64").length === 32)
+    .meta({ docUrl: guide("message_encryption_key") }),
+  SETUP_TOKEN: z
+    .string()
+    .min(32)
+    .meta({ docUrl: guide("setup_token") }),
 });
 
 export const publicEnvSchema = envSchema.pick({

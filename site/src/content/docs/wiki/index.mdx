@@ -1,0 +1,30 @@
+---
+title: OpenLove
+description: Documentation d'installation et de développement d'OpenLove.
+template: splash
+hero:
+  tagline: Une application de couple, auto-hébergée. Une instance, un couple.
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Aperçu
+
+<div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
+	<img src="/screenshots/mobile-light-home.webp" alt="Accueil : jours ensemble, prochaine date, humeur du jour" width="200" />
+	<img src="/screenshots/mobile-light-messages.webp" alt="Chat en temps réel avec accusé de lecture" width="200" />
+	<img src="/screenshots/mobile-dark-settings.webp" alt="Appairage de l'app Android par QR code" width="200" />
+</div>
+
+## Par où commencer
+
+<CardGrid stagger>
+	<Card title="Installer OpenLove" icon="document">
+		Pas de terminal. Vous créez un projet Supabase et générez vos secrets.
+		[Lire le guide d'installation](/wiki/installer/)
+	</Card>
+	<Card title="Développer" icon="setting">
+		Environnement local : Supabase CLI, secrets générés avec `openssl` ou PowerShell.
+		[Lire le guide développeur](/wiki/developper/)
+	</Card>
+</CardGrid>

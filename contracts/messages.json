@@ -1,0 +1,67 @@
+{
+  "valid": [
+    {
+      "items": [
+        {
+          "id": "42",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "body": "Bonne nuit",
+          "createdAt": "2026-10-30T22:00:00.000Z"
+        }
+      ],
+      "nextCursor": "42",
+      "partnerReadId": "42",
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    },
+    {
+      "items": [],
+      "nextCursor": null,
+      "partnerReadId": null,
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    }
+  ],
+  "invalid": [
+    {
+      "items": [
+        {
+          "id": "42",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "body": "Bonne nuit",
+          "createdAt": "2026-10-30T22:00:00.000Z"
+        }
+      ],
+      "partnerReadId": null,
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    },
+    {
+      "items": [],
+      "nextCursor": null,
+      "partnerReadId": null
+    },
+    {
+      "items": [
+        {
+          "id": "42",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "body": 1,
+          "createdAt": "2026-10-30T22:00:00.000Z"
+        }
+      ],
+      "nextCursor": null,
+      "partnerReadId": null,
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    },
+    {
+      "items": [
+        {
+          "id": "42",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "createdAt": "2026-10-30T22:00:00.000Z"
+        }
+      ],
+      "nextCursor": null,
+      "partnerReadId": null,
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    }
+  ]
+}

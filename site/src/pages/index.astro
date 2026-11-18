@@ -1,0 +1,59 @@
+---
+const repo = 'https://github.com/BaptisteLOpenSource/OpenLove';
+const shots = [
+	{ page: 'home', caption: 'Accueil', alt: 'Accueil : jours ensemble, prochaine date, humeur du jour' },
+	{ page: 'messages', caption: 'Messages', alt: 'Chat en temps réel avec accusé de lecture' },
+	{ page: 'settings', caption: 'Appairage', alt: "Appairage de l'app Android par QR code" },
+];
+---
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>OpenLove</title>
+		<meta name="description" content="Une application de couple, auto-hébergée. Une instance, un couple." />
+		<link rel="icon" href="/favicon.svg" />
+		<style>
+			:root { --accent: #4f6f8a; --ink: #1b2430; --paper: #f7f9fb; }
+			@media (prefers-color-scheme: dark) {
+				:root:not([data-theme='light']) { --ink: #e6edf3; --paper: #14191f; --accent: #8fb0c9; }
+			}
+			body { margin: 0; min-height: 100dvh; display: grid; place-items: center; padding: 16px;
+				background: var(--paper); color: var(--ink); font-family: system-ui, sans-serif; }
+			main { max-width: 36rem; display: grid; gap: 1.25rem; }
+			h1 { margin: 0; font-size: 2.5rem; color: var(--accent); }
+			p { margin: 0; line-height: 1.5; }
+			nav { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+			a.btn { padding: 0.6rem 1rem; border-radius: 999px; border: 1px solid var(--accent);
+				color: var(--accent); text-decoration: none; }
+			a.primary { background: var(--accent); color: var(--paper); }
+			.shots { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 0.5rem; }
+			.shots figure { margin: 0; flex: 0 0 min(70%, 11rem); scroll-snap-align: start; text-align: center; }
+			.shots img { width: 100%; height: auto; border-radius: 1.25rem; box-shadow: 0 6px 24px rgb(0 0 0 / 0.15); }
+			.shots figcaption { font-size: 0.875rem; margin-top: 0.5rem; }
+		</style>
+	</head>
+	<body>
+		<main>
+			<h1>OpenLove</h1>
+			<p>Une application de couple, auto-hébergée. Une instance, un couple.</p>
+			<nav>
+				<a class="btn primary" href="/wiki/installer/">Installer</a>
+				<a class="btn" href="/wiki/developper/">Développer</a>
+				<a class="btn" href={repo}>Code source</a>
+			</nav>
+			<section class="shots" aria-label="Aperçu de l'application">
+				{shots.map((s) => (
+					<figure>
+						<picture>
+							<source media="(prefers-color-scheme: dark)" srcset={`/screenshots/mobile-dark-${s.page}.webp`} />
+							<img src={`/screenshots/mobile-light-${s.page}.webp`} alt={s.alt} width="540" height="1099" loading="lazy" />
+						</picture>
+						<figcaption>{s.caption}</figcaption>
+					</figure>
+				))}
+			</section>
+		</main>
+	</body>
+</html>

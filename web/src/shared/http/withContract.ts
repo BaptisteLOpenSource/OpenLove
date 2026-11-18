@@ -1,22 +1,25 @@
-import { createHash, timingSafeEqual } from "node:crypto";
-
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
-import { env } from "@/shared/env";
-import { getPartner, type Partner } from "@/shared/supabase/server";
+import type { ErrorCode } from "@/shared/contracts/error";
+import { partnerOf, type Partner, serverClient } from "@/shared/supabase/server";
 
-type Auth = "partner" | "cron" | "public";
-type Ctx<A extends Auth> = A extends "partner" ? { partner: Partner } : object;
+import { bearerToken, fail } from "./envelope";
+
+type Auth = "partner" | "public";
+type Ctx<A extends Auth> = { req: Request } & (A extends "partner"
+  ? { partner: Partner; sb: SupabaseClient }
+  : object);
 type Schema = z.ZodType;
 
-function fail(status: number, code: string, message: string) {
-  return Response.json({ error: { code, message } }, { status });
-}
-
-const digest = (v: string) => createHash("sha256").update(v).digest();
-
-function bearer(req: Request) {
-  return /^Bearer (.+)$/.exec(req.headers.get("authorization") ?? "")?.[1];
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    readonly code: ErrorCode,
+    message: string,
+  ) {
+    super(message);
+  }
 }
 
 // S13: cookies ride along cross-site, so cookie mutations must prove same origin.
@@ -26,20 +29,20 @@ function sameOrigin(req: Request) {
   return !!origin && !!host && URL.parse(origin)?.host === host;
 }
 
-async function authorize(req: Request, mode: Auth): Promise<Response | { partner?: Partner }> {
+async function authorize(
+  req: Request,
+  mode: Auth,
+): Promise<Response | { partner?: Partner; sb?: SupabaseClient }> {
   if (mode === "public") return {};
-  const token = bearer(req);
-  if (mode === "partner") {
-    const mutation = req.method !== "GET" && req.method !== "HEAD";
-    if (!token && mutation && !sameOrigin(req)) return fail(403, "forbidden", "origin mismatch");
-    const who = await getPartner(token);
-    if (who.ok) return { partner: who.partner };
-    return who.code === "unauthorized"
-      ? fail(401, "unauthorized", "unauthorized")
-      : fail(403, "not_couple_member", "not a couple member");
-  }
-  const ok = token && timingSafeEqual(digest(token), digest(env().CRON_SECRET));
-  return ok ? {} : fail(401, "unauthorized", "unauthorized");
+  const token = bearerToken(req);
+  const mutation = req.method !== "GET" && req.method !== "HEAD";
+  if (!token && mutation && !sameOrigin(req)) return fail(403, "forbidden", "origin mismatch");
+  const sb = await serverClient(token);
+  const who = await partnerOf(sb, token);
+  if (who.ok) return { partner: who.partner, sb };
+  return who.code === "unauthorized"
+    ? fail(401, "unauthorized", "unauthorized")
+    : fail(403, "not_couple_member", "not a couple member");
 }
 
 async function readInput(req: Request): Promise<unknown> {
@@ -61,13 +64,15 @@ export function withContract<
       if (who instanceof Response) return who;
       const parsed = opts.input ? opts.input.safeParse(await readInput(req)) : undefined;
       if (parsed && !parsed.success) return fail(400, "validation_failed", "invalid input");
-      const out = opts.output.safeParse(await handler(parsed?.data as z.output<I>, who as Ctx<A>));
+      const ctx = { req, ...who } as Ctx<A>;
+      const out = opts.output.safeParse(await handler(parsed?.data as z.output<I>, ctx));
       if (!out.success) {
         console.error("withContract: output mismatch", out.error.issues);
         return fail(500, "internal", "internal error");
       }
       return Response.json({ data: out.data });
     } catch (err) {
+      if (err instanceof ApiError) return fail(err.status, err.code, err.message);
       console.error("withContract: handler threw", err);
       return fail(500, "internal", "internal error");
     }

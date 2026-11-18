@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OpenLove</string>
+    <string name="pairing_title">Appairer avec votre instance</string>
+    <string name="pairing_scan">Scanner le QR code</string>
+    <string name="pairing_scan_hint">Sur le site, ouvrez Réglages puis Appairer l\'app Android.</string>
+    <string name="pairing_manual">Se connecter sans QR code</string>
+    <string name="pairing_instance_url">Adresse de l\'instance</string>
+    <string name="pairing_email">E-mail</string>
+    <string name="pairing_password">Mot de passe</string>
+    <string name="pairing_submit">Se connecter</string>
+    <string name="error_code_expired">Code expiré. Affichez un nouveau QR code depuis les réglages.</string>
+    <string name="error_bad_credentials">E-mail ou mot de passe incorrect.</string>
+    <string name="error_not_member">Ce compte ne fait pas partie de ce couple.</string>
+    <string name="error_rate_limited">Trop de tentatives. Réessayez dans quelques minutes.</string>
+    <string name="error_invalid_link">Adresse ou QR code invalide.</string>
+    <string name="error_unreachable">Instance injoignable. Vérifiez votre connexion.</string>
+    <string name="retry">Réessayer</string>
+    <string name="home_milestone_title">Ensemble depuis</string>
+    <string name="home_upcoming_title">Prochaine date</string>
+    <string name="home_upcoming_none">Aucune date prévue</string>
+    <string name="home_upcoming_today">aujourd\'hui</string>
+    <string name="home_open_chat">Messages</string>
+    <string name="mood_title">Humeur du jour</string>
+    <string name="mood_mine">Toi : %s</string>
+    <string name="mood_partner">Partenaire : %s</string>
+    <string name="mood_none">Pas encore</string>
+    <string name="mood_open">Choisir mon humeur</string>
+    <string name="mood_close">Fermer</string>
+    <string name="mood_selected">%s (actuelle)</string>
+    <string name="mood_history_title">Ces derniers jours</string>
+    <string name="mood_history_line">%1$s : toi %2$s, partenaire %3$s</string>
+    <string name="mood_history_none">rien</string>
+    <string name="mood_happy">Joyeux</string>
+    <string name="mood_calm">Calme</string>
+    <string name="mood_tired">Fatigué</string>
+    <string name="mood_sad">Triste</string>
+    <string name="mood_anxious">Anxieux</string>
+    <string name="chat_title">Messages</string>
+    <string name="chat_hint">Écrire un message</string>
+    <string name="chat_send">Envoyer</string>
+    <string name="chat_load_older">Charger les messages précédents</string>
+    <string name="chat_failed">Connexion perdue. Nouvel essai en cours.</string>
+    <string name="chat_seen">Vu</string>
+    <plurals name="home_total_days">
+        <item quantity="one">%d jour</item>
+        <item quantity="many">%d jours</item>
+        <item quantity="other">%d jours</item>
+    </plurals>
+    <plurals name="home_upcoming_in_days">
+        <item quantity="one">dans %d jour</item>
+        <item quantity="many">dans %d jours</item>
+        <item quantity="other">dans %d jours</item>
+    </plurals>
+</resources>

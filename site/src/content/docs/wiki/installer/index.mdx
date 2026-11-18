@@ -1,0 +1,133 @@
+---
+title: Installer OpenLove
+description: Guide utilisateur. Vercel, projet Supabase, secrets et Firebase, sur Windows, macOS et Linux.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Ce guide prépare votre instance OpenLove sans installer de logiciel.
+Une seule étape demande un terminal, déjà présent sur votre système : PowerShell (Windows), Terminal (macOS, Linux).
+
+:::caution
+Ne partagez jamais une valeur secrète, ni dans un message, ni dans une capture d'écran.
+:::
+
+## 1. Vercel
+
+1. Forkez le dépôt OpenLove sur votre compte GitHub.
+2. Dans Vercel, importez votre fork : **Add New > Project**.
+3. Renseignez **Root Directory** : `web`.
+4. Ouvrez **Build and Deployment** et activez **Include files outside the root directory in the Build Step**. L'application lit `design/tokens.json` hors de `web/`. Sans cette option, le build échoue.
+
+Ne lancez pas encore le déploiement : les variables viennent aux étapes 2 et 3.
+
+## 2. Supabase
+
+1. Ouvrez [supabase.com](https://supabase.com), créez un compte et un nouveau projet.
+2. Notez le mot de passe de la base dans votre gestionnaire de mots de passe.
+3. Attendez la fin de l'initialisation du projet.
+4. Appliquez les migrations : dans **SQL Editor**, ouvrez chaque fichier de `supabase/migrations/` de votre fork, dans l'ordre de leur nom, collez-le, puis cliquez sur **Run**. Ne sautez aucun fichier.
+5. Ouvrez **Project Settings > API**. Les valeurs des étapes suivantes s'y trouvent.
+
+:::tip
+Avec la Supabase CLI (développeurs), la même étape s'écrit `supabase link --project-ref <ref>` puis `supabase db push`.
+:::
+
+## 3. Secrets et variables
+
+Les variables ci-dessous vont dans **Settings > Environment Variables** de Vercel. Après les avoir toutes saisies, redéployez.
+
+## SUPABASE_URL
+
+Valeur : **Project URL**, de la forme `https://<identifiant>.supabase.co`.
+
+Copiez-la telle quelle. Ce n'est pas un secret.
+
+## SUPABASE_ANON_KEY
+
+Valeur : la clé **anon** (publique) de la page **Project Settings > API**.
+
+Elle peut être visible par le navigateur. Ne la confondez pas avec la clé service_role.
+
+## SUPABASE_SERVICE_ROLE_KEY
+
+Valeur : la clé **service_role** de la même page.
+
+:::danger
+Cette clé contourne toutes les règles de sécurité de la base. Elle ne doit jamais apparaître côté navigateur ni dans un dépôt Git.
+:::
+
+## MESSAGE_ENCRYPTION_KEY
+
+Clé de chiffrement des Messages : 32 octets, encodés en base64.
+
+Le générateur de mots de passe Bitwarden ne produit pas ce format. Lancez la commande de votre système :
+
+<Tabs>
+	<TabItem label="Windows (PowerShell)">
+
+```powershell
+$octets = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($octets)
+[Convert]::ToBase64String($octets)
+```
+
+	</TabItem>
+	<TabItem label="macOS (Terminal)">
+
+```bash
+openssl rand -base64 32
+```
+
+	</TabItem>
+	<TabItem label="Linux (terminal)">
+
+```bash
+openssl rand -base64 32
+```
+
+	</TabItem>
+</Tabs>
+
+La sortie ressemble à `<génère-ta-valeur>` : 44 caractères qui se terminent par `=`.
+
+- Copiez la sortie dans votre gestionnaire de mots de passe.
+- Ne la générez qu'une fois. La perdre rend les Messages illisibles.
+
+## SETUP_TOKEN
+
+Secret demandé par le formulaire de premier lancement `/setup`. Il empêche un inconnu de créer le Couple à votre place.
+
+- 32 caractères minimum. Générez-le comme [MESSAGE_ENCRYPTION_KEY](#message_encryption_key), avec une autre valeur.
+- Gardez-le privé. Il ne sert qu'au premier lancement.
+
+## NEXT_PUBLIC_SUPABASE_URL
+
+Valeur : même valeur que [SUPABASE_URL](#supabase_url). Elle est exposée au navigateur.
+
+## NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+Valeur : même valeur que [SUPABASE_ANON_KEY](#supabase_anon_key). Elle est exposée au navigateur.
+
+## 4. Firebase (notifications, à venir)
+
+Les notifications push passent par Firebase Cloud Messaging. Cette version n'en a pas encore besoin : aucune variable Firebase n'est demandée par `/setup`.
+
+1. Ouvrez [console.firebase.google.com](https://console.firebase.google.com) et créez un projet.
+2. Gardez le projet pour les notifications. Les clés seront ajoutées à ce guide et à `/setup` avec la fonctionnalité qui les utilise.
+
+## 5. Checklist de sécurité hébergée
+
+Cette checklist se fait dans le tableau de bord Supabase. Aucun de ces réglages n'est dans le code : il faut les appliquer à la main sur votre projet.
+
+- [ ] **Auth > Providers > Email** : désactivez les inscriptions une fois les deux partenaires créés.
+- [ ] **Auth > Password security** : longueur minimale 8, protection contre les mots de passe fuités activée (plan Pro).
+- [ ] **Auth > Sessions** : durée de vie limitée et délai d'inactivité (plan Pro).
+- [ ] **Database > Settings** : Enforce SSL activé, restrictions réseau (allowlist). L'app utilise HTTPS, seul Postgres direct est concerné.
+- [ ] **Advisors > Security Advisor** : aucun WARN.
+
+## Étape finale : `/setup`
+
+Ouvrez la page `/setup` de votre site. Chaque variable doit afficher **OK**. Si une variable est manquante ou invalide, son lien **Guide pas à pas** ouvre la section correspondante de ce guide.
+
+Quand toutes les variables sont vertes, la page propose de créer votre couple. Finissez ensuite la checklist de la section 5.

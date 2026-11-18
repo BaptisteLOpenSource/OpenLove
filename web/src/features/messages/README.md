@@ -1,0 +1,25 @@
+# messages
+
+Chat between the two Partenaires of a Couple.
+
+- Language: Message (`messages`), text only in this slice. See `CONTEXT.md`.
+- Provenance: `/api/messages` (GET cursor list, POST send), `/api/messages/read` (POST, marks read)
+  and the `/messages` page, all via `server/messages.ts`. Ordering and cursor = identity `id`
+  (newest first, `cursor` = last id seen). Browser store `ui/useChat.ts` is the only `fetch` caller.
+- Vu: `message_reads` row per Partenaire. `partnerReadId` = other Partenaire's row. Marked read id
+  is picked by the server (newest Message), never by the client. Clients cannot write
+  `message_reads`: only RPC `mark_message_read` (SECURITY DEFINER, never moves backward).
+- Realtime: private channel `couple:<coupleId>`. DB triggers `realtime.send` on insert `messages`
+  and insert/update `message_reads`, payload = id only, never body. Typing = client broadcast,
+  throttled 2 s, shown 5 s. Every event refetches; re-SUBSCRIBED refetches too (missed signals).
+  Known limit: RLS cannot pin the event name of a client broadcast, so a Partenaire can send any
+  event on own topic. Impact: extra refetch only. Cross-couple access stays closed.
+- Invariants: `limit` 1..100 (Zod, default 50). Text trimmed, 1..4000 chars. Text encrypted with
+  AES-256-GCM before insert ([ADR 0010](../../../../docs/decisions/0010-message-encryption-at-rest.md)).
+  RLS: read and insert scoped to `private.my_couple_id()`, insert needs `author_id = auth.uid()`.
+  No update/delete grant.
+- Own id: `/api/messages` returns `me` (caller's Partenaire id). Clients never decode the JWT.
+- Known duplicate: `ui/merge.ts` (`mergeMessages`, `seenId`) has a Kotlin twin in
+  `mobile/androidApp/.../chat/ChatModel.kt`. Two languages, no shared code path: keep both in step.
+- Known limit: `partnerReadId` reads the one `message_reads` row of the other Partenaire with
+  `maybeSingle()`. Holds while a Couple has exactly 2 members; a 3rd would make the read fail (500).

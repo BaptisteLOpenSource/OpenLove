@@ -12,13 +12,59 @@
       "invalid": "Invalide"
     },
     "genericHowTo": "Renseignez cette variable dans votre fichier .env, puis redémarrez l'instance.",
+    "guide": "Guide pas à pas",
     "vars": {
       "SUPABASE_URL": "URL du projet Supabase : tableau de bord, Project Settings > API > Project URL.",
       "SUPABASE_ANON_KEY": "Clé anon : tableau de bord Supabase, Project Settings > API > anon public.",
       "SUPABASE_SERVICE_ROLE_KEY": "Clé service_role : tableau de bord Supabase, Project Settings > API. Secrète, serveur uniquement.",
-      "CRON_SECRET": "Secret d'au moins 16 caractères. Générez-le avec : openssl rand -hex 16",
       "NEXT_PUBLIC_SUPABASE_URL": "Même valeur que SUPABASE_URL, exposée au navigateur.",
-      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "Même valeur que SUPABASE_ANON_KEY, exposée au navigateur."
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "Même valeur que SUPABASE_ANON_KEY, exposée au navigateur.",
+      "MESSAGE_ENCRYPTION_KEY": "Clé AES-256 du chat: 32 octets en base64 (openssl rand -base64 32). Secrète, jamais en base. La perdre rend les Messages illisibles.",
+      "SETUP_TOKEN": "Secret demandé par le formulaire de premier lancement : empêche un inconnu de créer le Couple. 32 caractères minimum (openssl rand -base64 32). Gardez-le privé."
+    },
+    "checklistTitle": "Checklist de sécurité du tableau de bord hébergé",
+    "steps": {
+      "vercel": {
+        "title": "1. Vercel",
+        "instructions": [
+          "Importez votre fork GitHub dans Vercel.",
+          "Root Directory : web.",
+          "Activez « Include files outside the root directory in the Build Step » (l'app lit design/tokens.json).",
+          "Une fois l'étape Supabase faite, ajoutez chaque variable ci-dessous dans Settings > Environment Variables, puis redéployez."
+        ]
+      },
+      "supabase": {
+        "title": "2. Supabase",
+        "instructions": [
+          "Créez un projet Supabase.",
+          "Liez le projet puis appliquez les migrations : supabase link --project-ref <ref> puis supabase db push.",
+          "Copiez l'URL et les clés depuis Project Settings > API dans les variables ci-dessous."
+        ],
+        "checklist": [
+          "Auth > Providers > Email : désactivez les inscriptions une fois les deux partenaires créés.",
+          "Auth > Password security : longueur minimale 8, protection contre les mots de passe fuités activée (plan Pro).",
+          "Auth > Sessions : durée de vie limitée et délai d'inactivité (plan Pro).",
+          "Database > Settings : Enforce SSL activé, restrictions réseau (allowlist). L'app utilise HTTPS, seul Postgres direct est concerné.",
+          "Advisors > Security Advisor : aucun WARN."
+        ]
+      },
+      "other": {
+        "title": "Autres variables"
+      }
+    },
+    "firstRun": {
+      "title": "Créer votre couple",
+      "email": "E-mail",
+      "password": "Mot de passe (8 caractères minimum)",
+      "partnerAName": "Prénom du partenaire A",
+      "partnerBName": "Prénom du partenaire B",
+      "startDate": "Début de la relation",
+      "seed": "Couleur de l'application",
+      "submit": "Créer le couple",
+      "invalid": "Vérifiez les champs : e-mail valide, mot de passe de 8 caractères minimum, prénoms et date renseignés.",
+      "setupToken": "Jeton de configuration (variable SETUP_TOKEN)",
+      "token": "Jeton de configuration incorrect.",
+      "exists": "Un couple existe déjà sur cette instance."
     }
   },
   "login": {
@@ -27,14 +73,63 @@
     "password": "Mot de passe",
     "submit": "Se connecter",
     "invalid": "E-mail ou mot de passe incorrect.",
-    "refused": "Ce compte ne fait pas partie de ce couple."
+    "rate_limited": "Trop de tentatives. Réessayez dans quelques minutes."
+  },
+  "settings": {
+    "title": "Réglages",
+    "pairing": {
+      "title": "Appairer l'app Android",
+      "intro": "Scannez ce QR code depuis l'app. Il expire après 5 minutes et ne sert qu'une fois.",
+      "show": "Afficher le QR code",
+      "qrAlt": "QR code d'appairage",
+      "expires": "Expire à {time}",
+      "refused": "Action refusée."
+    }
   },
   "home": {
+    "partners": "{a} & {b}",
     "logout": "Se déconnecter",
+    "settings": "Réglages",
+    "messages": "Messages",
     "milestone": {
       "title": "Ensemble depuis",
       "totalDays": "{count, plural, =0 {0 jour} one {# jour} other {# jours}}",
       "breakdown": "{years, plural, =0 {} one {# an} other {# ans}} {months, plural, =0 {} other {# mois}} {days, plural, =0 {} one {# jour} other {# jours}}"
+    },
+    "upcomingDate": {
+      "title": "Prochaine date",
+      "none": "Aucune date prévue",
+      "inDays": "{count, plural, =0 {aujourd'hui} one {dans # jour} other {dans # jours}}"
+    },
+    "mood": {
+      "title": "Humeur du jour",
+      "mineLine": "Toi : {value}",
+      "partnerLine": "Partenaire : {value}",
+      "none": "Pas encore",
+      "values": {
+        "happy": "Joyeux",
+        "calm": "Calme",
+        "tired": "Fatigué",
+        "sad": "Triste",
+        "anxious": "Anxieux"
+      },
+      "open": "Choisir mon humeur",
+      "close": "Fermer",
+      "historyTitle": "Ces derniers jours",
+      "historyLine": "{day} : toi {mine}, partenaire {partner}",
+      "historyNone": "rien",
+      "banner": "Pas encore d'humeur aujourd'hui. Comment ça va ?",
+      "dismiss": "Masquer"
     }
+  },
+  "messages": {
+    "title": "Messages",
+    "empty": "Aucun message pour l'instant.",
+    "placeholder": "Écrire un message",
+    "send": "Envoyer",
+    "loadOlder": "Messages plus anciens",
+    "seen": "Vu",
+    "typing": "En train d'écrire...",
+    "sendFailed": "Envoi impossible, réessayez."
   }
 }

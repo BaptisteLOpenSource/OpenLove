@@ -31,7 +31,7 @@ Comportements inacceptables :
 ## Application
 
 Signaler un comportement inacceptable au mainteneur via GitHub : ouvrir un avis de sécurité privé sur
-<https://github.com/BaptisteLeDev/OpenLove/security/advisories/new> (catégorie « Other »), ou contacter
+<https://github.com/BaptisteLOpenSource/OpenLove/security/advisories/new> (catégorie « Other »), ou contacter
 directement [@BaptisteLeDev](https://github.com/BaptisteLeDev). Tous les signalements sont examinés et
 restent confidentiels.
 
@@ -86,7 +86,7 @@ Behaviour that does not:
 ## Enforcement
 
 Report unacceptable behaviour to the maintainer through GitHub: open a private security advisory at
-<https://github.com/BaptisteLeDev/OpenLove/security/advisories/new> (choose the "Other" category), or
+<https://github.com/BaptisteLOpenSource/OpenLove/security/advisories/new> (choose the "Other" category), or
 contact [@BaptisteLeDev](https://github.com/BaptisteLeDev) directly. All reports are reviewed and kept
 confidential.
 

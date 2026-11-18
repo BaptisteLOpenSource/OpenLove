@@ -1,23 +1,43 @@
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { signOut } from "@/features/couple/server/auth";
-import { getMilestone } from "@/features/home/server/getMilestone";
+import { getHome, getPartnerNames } from "@/features/home/server/getHome";
+import { setMoodAction } from "@/features/home/server/moodAction";
 import { Milestone } from "@/features/home/ui/Milestone";
-import { getPartner } from "@/shared/supabase/server";
+import { Mood } from "@/features/home/ui/Mood";
+import { MoodBanner } from "@/features/home/ui/MoodBanner";
+import { UpcomingDate } from "@/features/home/ui/UpcomingDate";
+import { partnerOf, serverClient } from "@/shared/supabase/server";
 
 export default async function HomePage() {
-  const result = await getPartner();
+  const sb = await serverClient();
+  const result = await partnerOf(sb);
   if (!result.ok) redirect("/login");
   const t = await getTranslations("home");
+  const [home, names] = await Promise.all([
+    getHome(sb, result.partner.coupleId, result.partner.userId),
+    getPartnerNames(sb, result.partner.coupleId),
+  ]);
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 p-6">
-      <Milestone value={await getMilestone(result.partner.coupleId)} />
+      {home.mood.mine === null && <MoodBanner action={setMoodAction} />}
+      <h1 className="text-headline-large">{t("partners", names)}</h1>
+      <Milestone value={home.milestone} />
+      <UpcomingDate value={home.upcomingDate} />
+      <Mood value={home.mood} history={home.moodHistory} action={setMoodAction} />
+      <Link href="/messages" className="rounded-full border px-4 py-2">
+        {t("messages")}
+      </Link>
       <form action={signOut}>
         <button type="submit" className="rounded-full border px-4 py-2">
           {t("logout")}
         </button>
       </form>
+      <Link href="/settings" className="rounded-full border px-4 py-2">
+        {t("settings")}
+      </Link>
     </main>
   );
 }
