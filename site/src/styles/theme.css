@@ -1,0 +1,12 @@
+/* Accent = seed design/tokens.json (#4f6f8a). Var names unverified against Starlight source. */
+:root {
+	--sl-color-accent-low: #d6e2ec;
+	--sl-color-accent: #4f6f8a;
+	--sl-color-accent-high: #213847;
+}
+
+:root[data-theme='dark'] {
+	--sl-color-accent-low: #213847;
+	--sl-color-accent: #8fb0c9;
+	--sl-color-accent-high: #d6e2ec;
+}
