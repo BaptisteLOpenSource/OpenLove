@@ -41,7 +41,12 @@ export async function ensureUser(admin: SupabaseClient, email: string): Promise<
 export async function seed(admin: SupabaseClient): Promise<{ coupleId: string }> {
   const a = await ensureUser(admin, SEED.emails.a);
   const b = await ensureUser(admin, SEED.emails.b);
-  await ensureUser(admin, SEED.emails.stranger);
+  const stranger = await ensureUser(admin, SEED.emails.stranger);
+  // Forged user-editable claim: must not authorize (role lives in app_metadata only).
+  const forged = await admin.auth.admin.updateUserById(stranger, {
+    user_metadata: { role: "partner_a", pseudo: "partner_a" },
+  });
+  if (forged.error) throw forged.error;
 
   const existing = await admin.from("couple_members").select("couple_id").eq("user_id", a);
   if (existing.error) throw existing.error;

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { createClient } from "@supabase/supabase-js";
 
 import { localAdmin, SEED, seed } from "../scripts/seed";
 import fr from "../src/shared/i18n/messages/fr.json" with { type: "json" };
@@ -45,11 +46,52 @@ test("Partenaire logs in on web", async ({ page }) => {
 
 test("Stranger cannot enter", async ({ page }) => {
   await logIn(page, SEED.emails.stranger);
-  await expect(page.getByRole("alert").filter({ hasText: fr.login.refused })).toBeVisible();
+  await expect(page.getByRole("alert").filter({ hasText: fr.login.invalid })).toBeVisible();
   await expect(page).toHaveURL(/\/login$/);
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByText(fr.home.milestone.title)).toHaveCount(0);
+});
+
+async function accessToken(email: string): Promise<string> {
+  const sb = createClient(url, anonKey, { auth: { persistSession: false } });
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: SEED.password });
+  if (error || !data.session) throw error ?? new Error(`no session for ${email}`);
+  return data.session.access_token;
+}
+
+test("non-member bearer is refused by API, public theme still answers", async ({ request }) => {
+  const headers = { Authorization: `Bearer ${await accessToken(SEED.emails.stranger)}` };
+  const home = await request.get("/api/home", { headers });
+  expect(home.status()).toBe(401);
+  expect((await home.json()).error.code).toBe("unauthorized");
+  expect((await request.get("/api/theme", { headers })).status()).toBe(200);
+});
+
+test("partner bearer reaches API", async ({ request }) => {
+  const headers = { Authorization: `Bearer ${await accessToken(SEED.emails.a)}` };
+  expect((await request.get("/api/home", { headers })).status()).toBe(200);
+});
+
+test("login failures are indistinguishable", async ({ request }) => {
+  const cases = [
+    { email: "nobody@example.com", password: "x" },
+    { email: SEED.emails.a, password: "not-the-password" },
+    { email: SEED.emails.stranger, password: SEED.password },
+  ];
+  const results = [];
+  for (const data of cases) {
+    const started = Date.now();
+    const res = await request.post("/api/session", { data });
+    results.push({ status: res.status(), body: await res.json(), ms: Date.now() - started });
+  }
+  for (const r of results) {
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual(results[0]?.body);
+    expect(r.ms).toBeGreaterThanOrEqual(600);
+  }
+  const times = results.map((r) => r.ms);
+  expect(Math.max(...times) - Math.min(...times)).toBeLessThan(50);
 });
 
 test("wrong password is invalid", async ({ page }) => {

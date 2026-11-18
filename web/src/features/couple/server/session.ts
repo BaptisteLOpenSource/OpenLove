@@ -4,9 +4,11 @@ import { isAuthApiError } from "@supabase/supabase-js";
 import type { RefreshRequest, SessionResponse, SignInRequest } from "@/shared/contracts/session";
 import { clientIp } from "@/shared/http/clientIp";
 import { ApiError } from "@/shared/http/withContract";
+import { roleOf } from "@/shared/supabase/role";
 import { adminClient, anonClient } from "@/shared/supabase/server";
 
-import { LOGIN_LIMIT } from "../domain/limits";
+import { LOGIN_FLOOR_MS, LOGIN_LIMIT } from "../domain/limits";
+import { atLeast } from "./atLeast";
 import { hitRateLimit } from "./rateLimit";
 
 export function toSession(s: {
@@ -26,28 +28,22 @@ export async function signInForSession(
   input: SignInRequest,
   { req }: { req: Request },
 ): Promise<SessionResponse> {
-  const allowed = await hitRateLimit(
-    `login:${clientIp(req.headers)}`,
-    LOGIN_LIMIT.max,
-    LOGIN_LIMIT.windowSeconds,
-  );
-  if (!allowed) throw new ApiError(429, "rate_limited", "too many attempts");
+  return atLeast(LOGIN_FLOOR_MS, async () => {
+    const allowed = await hitRateLimit(
+      `login:${clientIp(req.headers)}`,
+      LOGIN_LIMIT.max,
+      LOGIN_LIMIT.windowSeconds,
+    );
+    if (!allowed) throw new ApiError(429, "rate_limited", "too many attempts");
 
-  const { data, error } = await anonClient().auth.signInWithPassword(input);
-  if (error || !data.session) throw new ApiError(401, "unauthorized", "invalid credentials");
-
-  const admin = adminClient();
-  const { data: member, error: memberError } = await admin
-    .from("couple_members")
-    .select("user_id")
-    .eq("user_id", data.user.id)
-    .maybeSingle();
-  if (memberError) throw memberError;
-  if (!member) {
-    await admin.auth.admin.signOut(data.session.access_token);
-    throw new ApiError(403, "not_couple_member", "not a couple member");
-  }
-  return toSession(data.session);
+    const { data, error } = await anonClient().auth.signInWithPassword(input);
+    if (error || !data.session) throw new ApiError(401, "unauthorized", "invalid credentials");
+    if (!roleOf(data.user)) {
+      await adminClient().auth.admin.signOut(data.session.access_token);
+      throw new ApiError(401, "unauthorized", "invalid credentials");
+    }
+    return toSession(data.session);
+  });
 }
 
 export async function refreshSession({ refreshToken }: RefreshRequest): Promise<SessionResponse> {

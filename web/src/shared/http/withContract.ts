@@ -4,6 +4,8 @@ import { z } from "zod";
 import type { ErrorCode } from "@/shared/contracts/error";
 import { partnerOf, type Partner, serverClient } from "@/shared/supabase/server";
 
+import { bearerToken, fail } from "./envelope";
+
 type Auth = "partner" | "public";
 type Ctx<A extends Auth> = { req: Request } & (A extends "partner"
   ? { partner: Partner; sb: SupabaseClient }
@@ -20,14 +22,6 @@ export class ApiError extends Error {
   }
 }
 
-function fail(status: number, code: ErrorCode, message: string) {
-  return Response.json({ error: { code, message } }, { status });
-}
-
-function bearer(req: Request) {
-  return /^Bearer (.+)$/.exec(req.headers.get("authorization") ?? "")?.[1];
-}
-
 // S13: cookies ride along cross-site, so cookie mutations must prove same origin.
 function sameOrigin(req: Request) {
   const origin = req.headers.get("origin");
@@ -40,7 +34,7 @@ async function authorize(
   mode: Auth,
 ): Promise<Response | { partner?: Partner; sb?: SupabaseClient }> {
   if (mode === "public") return {};
-  const token = bearer(req);
+  const token = bearerToken(req);
   const mutation = req.method !== "GET" && req.method !== "HEAD";
   if (!token && mutation && !sameOrigin(req)) return fail(403, "forbidden", "origin mismatch");
   const sb = await serverClient(token);

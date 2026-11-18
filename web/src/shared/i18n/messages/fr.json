@@ -69,7 +69,6 @@
     "password": "Mot de passe",
     "submit": "Se connecter",
     "invalid": "E-mail ou mot de passe incorrect.",
-    "refused": "Ce compte ne fait pas partie de ce couple.",
     "rate_limited": "Trop de tentatives. Réessayez dans quelques minutes."
   },
   "settings": {
