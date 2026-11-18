@@ -6,10 +6,15 @@ import { Chat } from "./Chat";
 
 vi.mock("next-intl", () => ({ useTranslations: () => (key: string) => key }));
 
-// no Realtime in jsdom: channel is inert
+// no Realtime in jsdom: channel keeps handlers so a test can fire broadcasts
 const { realtime } = vi.hoisted(() => {
+  const handlers: Record<string, () => void> = {};
   const channel = {
-    on: () => channel,
+    handlers,
+    on: (_type: string, { event }: { event: string }, fn: () => void) => {
+      handlers[event] = fn;
+      return channel;
+    },
     subscribe: () => channel,
     send: async () => "ok",
   };
@@ -37,7 +42,7 @@ function fetchRouter(extra: (url: string, init?: RequestInit) => Response | unde
     const hit = extra(url, init);
     if (hit) return hit;
     if (url === "/api/messages/read") return json({ lastReadId: null });
-    return json({ items: [], nextCursor: null, partnerReadId: null });
+    return json({ items: [], nextCursor: null, partnerReadId: null, me: "me" });
   });
 }
 
@@ -49,14 +54,13 @@ afterEach(() => {
 test("load older fetches the cursor page and renders it above", async () => {
   const fetchMock = fetchRouter((url) =>
     url.startsWith("/api/messages?cursor=")
-      ? json({ items: [m("1", "older")], nextCursor: null, partnerReadId: null })
+      ? json({ items: [m("1", "older")], nextCursor: null, partnerReadId: null, me: "me" })
       : undefined,
   );
   vi.stubGlobal("fetch", fetchMock);
   render(
     <Chat
-      initial={{ items: [m("2", "newer")], nextCursor: "2", partnerReadId: null }}
-      me="me"
+      initial={{ items: [m("2", "newer")], nextCursor: "2", partnerReadId: null, me: "me" }}
       coupleId="c"
     />,
   );
@@ -77,8 +81,12 @@ test("Vu sits under the last own Message the partner has read", () => {
   const own = (id: string) => ({ ...m(id, id), authorId: "me" });
   render(
     <Chat
-      initial={{ items: [own("1"), own("2"), own("3")], nextCursor: null, partnerReadId: "2" }}
-      me="me"
+      initial={{
+        items: [own("1"), own("2"), own("3")],
+        nextCursor: null,
+        partnerReadId: "2",
+        me: "me",
+      }}
       coupleId="c"
     />,
   );
@@ -92,7 +100,7 @@ test("send posts the text and appends the returned Message", async () => {
   );
   vi.stubGlobal("fetch", fetchMock);
   render(
-    <Chat initial={{ items: [], nextCursor: null, partnerReadId: null }} me="me" coupleId="c" />,
+    <Chat initial={{ items: [], nextCursor: null, partnerReadId: null, me: "me" }} coupleId="c" />,
   );
 
   fireEvent.change(screen.getByRole("textbox", { name: "placeholder" }), {
@@ -105,4 +113,19 @@ test("send posts the text and appends the returned Message", async () => {
     "/api/messages",
     expect.objectContaining({ method: "POST", body: JSON.stringify({ text: "hi" }) }),
   );
+});
+
+test("burst of message broadcasts -> one mark-read after the debounce", async () => {
+  const fetch = fetchRouter(() => undefined);
+  vi.stubGlobal("fetch", fetch);
+  render(
+    <Chat initial={{ items: [], nextCursor: null, partnerReadId: null, me: "me" }} coupleId="c" />,
+  );
+  const reads = () => fetch.mock.calls.filter(([url]) => url === "/api/messages/read").length;
+  await waitFor(() => expect(reads()).toBe(1));
+  for (let i = 0; i < 3; i++) realtime.channel.handlers.message?.();
+  expect(reads()).toBe(1);
+  await waitFor(() => expect(reads()).toBe(2), { timeout: 2000 });
+  await new Promise((r) => setTimeout(r, 1200));
+  expect(reads()).toBe(2);
 });

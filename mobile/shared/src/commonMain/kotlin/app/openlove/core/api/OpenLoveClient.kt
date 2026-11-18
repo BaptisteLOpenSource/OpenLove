@@ -20,9 +20,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlin.io.encoding.Base64
 
 class ApiException(
     val status: Int,
@@ -81,21 +78,6 @@ class OpenLoveClient(
 
     suspend fun markRead() {
         authed<MarkReadResponse>("/api/messages/read", "{}")
-    }
-
-    // Partenaire id = JWT `sub`; the app has no other copy of it.
-    suspend fun myUserId(): String {
-        val payload =
-            current()
-                .session.accessToken
-                .substringAfter('.')
-                .substringBefore('.')
-        val claims = Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT_OPTIONAL).decode(payload)
-        return ApiJson
-            .parseToJsonElement(claims.decodeToString())
-            .jsonObject
-            .getValue("sub")
-            .jsonPrimitive.content
     }
 
     suspend fun theme(): ThemeResponse = send(current().instanceUrl, "/api/theme")

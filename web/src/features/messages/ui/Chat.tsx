@@ -11,13 +11,12 @@ import { useChat } from "./useChat";
 
 export function Chat({
   initial,
-  me,
   coupleId,
 }: {
   initial: z.input<typeof messagesResponse>;
-  me: string;
   coupleId: string;
 }) {
+  const { me } = initial;
   const t = useTranslations("messages");
   const { items, hasOlder, partnerReadId, loadOlder, send, failed, typing, onTyping } = useChat(
     initial,

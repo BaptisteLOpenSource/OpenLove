@@ -26,6 +26,8 @@ export const messagesResponse = z.strictObject({
   nextCursor: messageId.nullable(),
   // last Message the other Partenaire read; null = never
   partnerReadId: messageId.nullable(),
+  // caller's Partenaire id, so clients never decode the JWT
+  me: z.uuid(),
 });
 
 export const markReadResponse = z.strictObject({ lastReadId: messageId.nullable() });
@@ -39,12 +41,18 @@ const sample = {
 
 export const examples = {
   valid: [
-    { items: [sample], nextCursor: "42", partnerReadId: "42" },
-    { items: [], nextCursor: null, partnerReadId: null },
+    { items: [sample], nextCursor: "42", partnerReadId: "42", me: sample.authorId },
+    { items: [], nextCursor: null, partnerReadId: null, me: sample.authorId },
   ],
   invalid: [
-    { items: [sample], partnerReadId: null },
-    { items: [{ ...sample, body: 1 }], nextCursor: null, partnerReadId: null },
-    { items: [{ ...sample, body: undefined }], nextCursor: null, partnerReadId: null },
+    { items: [sample], partnerReadId: null, me: sample.authorId },
+    { items: [], nextCursor: null, partnerReadId: null },
+    { items: [{ ...sample, body: 1 }], nextCursor: null, partnerReadId: null, me: sample.authorId },
+    {
+      items: [{ ...sample, body: undefined }],
+      nextCursor: null,
+      partnerReadId: null,
+      me: sample.authorId,
+    },
   ],
 };

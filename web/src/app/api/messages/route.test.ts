@@ -22,7 +22,12 @@ const get = (q: string) => GET(new Request(`http://x/api/messages${q}`));
 beforeEach(() => {
   vi.clearAllMocks();
   partnerOf.mockResolvedValue({ ok: true, partner });
-  listMessages.mockResolvedValue({ items: [], nextCursor: null, partnerReadId: null });
+  listMessages.mockResolvedValue({
+    items: [],
+    nextCursor: null,
+    partnerReadId: null,
+    me: "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+  });
 });
 
 test("GET without session -> 401", async () => {

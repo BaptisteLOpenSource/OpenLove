@@ -52,10 +52,9 @@ class ChatModel(
 
     suspend fun refresh() =
         guarded {
-            val me = _state.value.me ?: client.myUserId()
             val page = client.messages()
             merge(page.items)
-            _state.value = _state.value.copy(me = me, partnerReadId = page.partnerReadId)
+            _state.value = _state.value.copy(me = page.me, partnerReadId = page.partnerReadId)
             if (!loaded) {
                 loaded = true
                 setOlder(page)
@@ -98,9 +97,8 @@ class ChatModel(
             }
         }
 
-    // Network, server envelope, DTO validation, malformed token: the poll must survive them.
-    private fun Exception.isRecoverable() =
-        this is ApiException || this is IOException || this is IllegalArgumentException || this is NoSuchElementException
+    // Network, server envelope, DTO validation: the poll must survive them.
+    private fun Exception.isRecoverable() = this is ApiException || this is IOException || this is IllegalArgumentException
 
     private fun setOlder(page: MessagesResponse) {
         olderCursor = page.nextCursor

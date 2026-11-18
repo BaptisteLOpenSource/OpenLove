@@ -10,12 +10,14 @@
         }
       ],
       "nextCursor": "42",
-      "partnerReadId": "42"
+      "partnerReadId": "42",
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
     },
     {
       "items": [],
       "nextCursor": null,
-      "partnerReadId": null
+      "partnerReadId": null,
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
     }
   ],
   "invalid": [
@@ -28,6 +30,12 @@
           "createdAt": "2026-10-30T22:00:00.000Z"
         }
       ],
+      "partnerReadId": null,
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    },
+    {
+      "items": [],
+      "nextCursor": null,
       "partnerReadId": null
     },
     {
@@ -40,7 +48,8 @@
         }
       ],
       "nextCursor": null,
-      "partnerReadId": null
+      "partnerReadId": null,
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
     },
     {
       "items": [
@@ -51,7 +60,8 @@
         }
       ],
       "nextCursor": null,
-      "partnerReadId": null
+      "partnerReadId": null,
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
     }
   ]
 }
