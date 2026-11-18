@@ -1,12 +1,34 @@
 import { z } from "zod";
 
+declare module "zod" {
+  interface GlobalMeta {
+    docUrl?: string;
+  }
+}
+
+// shortcut: placeholder host until wiki.<domain> is live, swap here only
+const WIKI_URL = "https://wiki.example.org";
+const guide = (anchor: string) => `${WIKI_URL}/installer/#${anchor}`;
+
 export const envSchema = z.object({
-  SUPABASE_URL: z.url(),
-  SUPABASE_ANON_KEY: z.string().min(1),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  NEXT_PUBLIC_SUPABASE_URL: z.url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
-  MESSAGE_ENCRYPTION_KEY: z.base64().refine((v) => Buffer.from(v, "base64").length === 32),
+  SUPABASE_URL: z.url().meta({ docUrl: guide("supabase_url") }),
+  SUPABASE_ANON_KEY: z
+    .string()
+    .min(1)
+    .meta({ docUrl: guide("supabase_anon_key") }),
+  SUPABASE_SERVICE_ROLE_KEY: z
+    .string()
+    .min(1)
+    .meta({ docUrl: guide("supabase_service_role_key") }),
+  NEXT_PUBLIC_SUPABASE_URL: z.url().meta({ docUrl: guide("next_public_supabase_url") }),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z
+    .string()
+    .min(1)
+    .meta({ docUrl: guide("next_public_supabase_anon_key") }),
+  MESSAGE_ENCRYPTION_KEY: z
+    .base64()
+    .refine((v) => Buffer.from(v, "base64").length === 32)
+    .meta({ docUrl: guide("message_encryption_key") }),
 });
 
 export const publicEnvSchema = envSchema.pick({

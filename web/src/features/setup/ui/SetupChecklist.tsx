@@ -19,7 +19,7 @@ export function SetupChecklist({ items }: { items: EnvCheckItem[] }) {
           )}
           {group.items.length > 0 && (
             <ul className="flex flex-col gap-3">
-              {group.items.map(({ key, status }) => (
+              {group.items.map(({ key, status, docUrl }) => (
                 <li key={key} className="flex flex-col gap-1">
                   <p>
                     <code>{key}</code> <span>{t(`status.${status}`)}</span>
@@ -27,6 +27,11 @@ export function SetupChecklist({ items }: { items: EnvCheckItem[] }) {
                   <p className="text-body-medium">
                     {t.has(`vars.${key}`) ? t(`vars.${key}`) : t("genericHowTo")}
                   </p>
+                  {docUrl && (
+                    <a href={docUrl} target="_blank" rel="noopener noreferrer">
+                      {t("guide")}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

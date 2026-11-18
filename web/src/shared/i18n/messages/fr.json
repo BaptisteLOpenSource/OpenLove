@@ -12,6 +12,7 @@
       "invalid": "Invalide"
     },
     "genericHowTo": "Renseignez cette variable dans votre fichier .env, puis redémarrez l'instance.",
+    "guide": "Guide pas à pas",
     "vars": {
       "SUPABASE_URL": "URL du projet Supabase : tableau de bord, Project Settings > API > Project URL.",
       "SUPABASE_ANON_KEY": "Clé anon : tableau de bord Supabase, Project Settings > API > anon public.",

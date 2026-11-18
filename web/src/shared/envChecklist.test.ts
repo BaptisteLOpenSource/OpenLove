@@ -48,6 +48,13 @@ test("the real schema yields one missing item per key on empty env", () => {
   expect(result.every((i) => i.status === "missing")).toBe(true);
 });
 
+test("docUrl comes from the schema meta", () => {
+  const documented = z.object({ URL: z.url().meta({ docUrl: "https://d.io/x" }) });
+  expect(checkEnv(documented, {})).toEqual([
+    { key: "URL", status: "missing", docUrl: "https://d.io/x" },
+  ]);
+});
+
 test("never leaks provided values", () => {
   const out = JSON.stringify(checkEnv(schema, { URL: "supersecret-bad", TOKEN: "supersecret-ok" }));
   expect(out).not.toContain("supersecret");
