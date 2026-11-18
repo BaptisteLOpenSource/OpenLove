@@ -34,6 +34,7 @@ fun seenId(
 
 class ChatModel(
     private val client: OpenLoveClient,
+    private val onSessionLost: () -> Unit = {},
 ) {
     private val _state = MutableStateFlow(ChatState())
     val state: StateFlow<ChatState> = _state
@@ -93,6 +94,7 @@ class ChatModel(
                 _state.value = _state.value.copy(failed = false)
             } catch (e: Exception) {
                 if (!e.isRecoverable()) throw e
+                if (e is ApiException && e.status == 401) onSessionLost()
                 _state.value = _state.value.copy(failed = true)
             }
         }

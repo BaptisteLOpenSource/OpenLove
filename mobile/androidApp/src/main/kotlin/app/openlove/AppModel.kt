@@ -60,7 +60,9 @@ class AppModel(
     }
 
     fun openChat() {
-        (_screen.value as? Screen.Home)?.let { _screen.value = Screen.Chat(it, ChatModel(client)) }
+        (_screen.value as? Screen.Home)?.let {
+            _screen.value = Screen.Chat(it, ChatModel(client, onSessionLost = { _screen.value = Screen.Pairing() }))
+        }
     }
 
     fun back() {

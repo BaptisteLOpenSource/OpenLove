@@ -117,4 +117,20 @@ class ChatModelTest {
             chat.refresh()
             assertEquals(listOf("10", "11"), chat.ids())
         }
+
+    @Test
+    fun refusedRefreshLosesSessionWithoutKillingPoll() =
+        runTest {
+            val errorBody = """{"error":{"code":"unauthorized","message":"no"}}"""
+            val engine =
+                MockEngine {
+                    respond(errorBody, HttpStatusCode.Unauthorized, headersOf(HttpHeaders.ContentType, "application/json"))
+                }
+            var lost = 0
+            val chat = ChatModel(OpenLoveClient(MemoryStore(), createApiClient(engine)), onSessionLost = { lost++ })
+            chat.refresh()
+            chat.refresh()
+            assertEquals(2, lost)
+            assertTrue(chat.state.value.failed)
+        }
 }
