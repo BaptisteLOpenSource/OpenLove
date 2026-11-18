@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,8 +16,12 @@ import app.openlove.R
 import app.openlove.core.api.HomeResponse
 
 @Composable
-fun HomeScreen(home: HomeResponse) {
+fun HomeScreen(
+    home: HomeResponse,
+    onOpenChat: () -> Unit,
+) {
     Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Button(onClick = onOpenChat) { Text(stringResource(R.string.home_open_chat)) }
         Text(stringResource(R.string.home_milestone_title), style = MaterialTheme.typography.titleMedium)
         val total = home.milestone.totalDays
         Text(pluralStringResource(R.plurals.home_total_days, total, total), style = MaterialTheme.typography.displaySmall)

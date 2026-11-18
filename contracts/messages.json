@@ -9,11 +9,13 @@
           "createdAt": "2026-10-30T22:00:00.000Z"
         }
       ],
-      "nextCursor": "42"
+      "nextCursor": "42",
+      "partnerReadId": "42"
     },
     {
       "items": [],
-      "nextCursor": null
+      "nextCursor": null,
+      "partnerReadId": null
     }
   ],
   "invalid": [
@@ -25,7 +27,8 @@
           "body": "Bonne nuit",
           "createdAt": "2026-10-30T22:00:00.000Z"
         }
-      ]
+      ],
+      "partnerReadId": null
     },
     {
       "items": [
@@ -36,7 +39,8 @@
           "createdAt": "2026-10-30T22:00:00.000Z"
         }
       ],
-      "nextCursor": null
+      "nextCursor": null,
+      "partnerReadId": null
     },
     {
       "items": [
@@ -46,7 +50,8 @@
           "createdAt": "2026-10-30T22:00:00.000Z"
         }
       ],
-      "nextCursor": null
+      "nextCursor": null,
+      "partnerReadId": null
     }
   ]
 }

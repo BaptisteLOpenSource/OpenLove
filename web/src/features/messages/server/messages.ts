@@ -52,9 +52,11 @@ export async function sendMessage(
 
 export async function listMessages(
   { limit, cursor }: z.output<typeof messagesQuery>,
+  userId: string,
   sb?: SupabaseClient,
 ) {
-  let q = (sb ?? (await serverClient()))
+  const client = sb ?? (await serverClient());
+  let q = client
     .from("messages")
     .select(COLUMNS)
     .order("id", { ascending: false })
@@ -62,9 +64,40 @@ export async function listMessages(
   if (cursor) q = q.lt("id", cursor);
   const { data, error } = await q;
   if (error) throw error;
+  const { data: read, error: readError } = await client
+    .from("message_reads")
+    .select("last_read_id")
+    .neq("partner_id", userId)
+    .maybeSingle();
+  if (readError) throw readError;
   const page = data.slice(0, limit);
   return {
     items: page.flatMap(readable),
     nextCursor: data.length > limit ? String(page[page.length - 1]?.id) : null,
+    partnerReadId: read ? String(read.last_read_id) : null,
   };
+}
+
+// id from the server, never from the client: a Partenaire cannot mark future Messages read
+export async function markRead(
+  partner: Pick<Partner, "userId" | "coupleId">,
+  sb?: SupabaseClient,
+): Promise<{ lastReadId: string | null }> {
+  const client = sb ?? (await serverClient());
+  const { data, error } = await client
+    .from("messages")
+    .select("id")
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return { lastReadId: null };
+  const { error: upsertError } = await client
+    .from("message_reads")
+    .upsert(
+      { couple_id: partner.coupleId, partner_id: partner.userId, last_read_id: data.id },
+      { onConflict: "couple_id,partner_id" },
+    );
+  if (upsertError) throw upsertError;
+  return { lastReadId: String(data.id) };
 }

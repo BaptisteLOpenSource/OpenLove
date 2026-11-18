@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class MessagesResponse(
     val items: List<Message>,
     val nextCursor: String?,
+    val partnerReadId: String?,
 )
 
 @Serializable

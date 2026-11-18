@@ -20,6 +20,13 @@
     <string name="home_upcoming_title">Prochaine date</string>
     <string name="home_upcoming_none">Aucune date prévue</string>
     <string name="home_upcoming_today">aujourd\'hui</string>
+    <string name="home_open_chat">Messages</string>
+    <string name="chat_title">Messages</string>
+    <string name="chat_hint">Écrire un message</string>
+    <string name="chat_send">Envoyer</string>
+    <string name="chat_load_older">Charger les messages précédents</string>
+    <string name="chat_failed">Connexion perdue. Nouvel essai en cours.</string>
+    <string name="chat_seen">Vu</string>
     <plurals name="home_total_days">
         <item quantity="one">%d jour</item>
         <item quantity="many">%d jours</item>

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.openlove.chat.ChatScreen
 import app.openlove.core.theme.OpenLoveTheme
 import app.openlove.home.HomeScreen
 import app.openlove.pairing.PairingScreen
@@ -62,7 +63,8 @@ private fun Content(
                 onScan = { scan(context, scope, model) },
                 onSignIn = { url, email, password -> scope.launch { model.signIn(url, email, password) } },
             )
-        is Screen.Home -> HomeScreen(screen.home)
+        is Screen.Home -> HomeScreen(screen.home, onOpenChat = model::openChat)
+        is Screen.Chat -> ChatScreen(screen.chat, onBack = model::back)
         Screen.Unreachable ->
             Centered {
                 Text(stringResource(R.string.error_unreachable))

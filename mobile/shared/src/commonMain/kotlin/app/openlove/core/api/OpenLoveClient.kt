@@ -13,12 +13,16 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
+import io.ktor.http.encodeURLParameter
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlin.io.encoding.Base64
 
 class ApiException(
     val status: Int,
@@ -47,6 +51,11 @@ private data class RefreshBody(
     val refreshToken: String,
 )
 
+@Serializable
+private data class SendBody(
+    val text: String,
+)
+
 class OpenLoveClient(
     private val store: SessionStore,
     private val http: HttpClient = createApiClient(),
@@ -65,6 +74,28 @@ class OpenLoveClient(
 
     suspend fun home(): HomeResponse = authed("/api/home")
 
+    suspend fun messages(cursor: String? = null): MessagesResponse =
+        authed("/api/messages" + (cursor?.let { "?cursor=${it.encodeURLParameter()}" } ?: ""))
+
+    suspend fun sendMessage(text: String): Message = authed("/api/messages", ApiJson.encodeToString(SendBody(text)))
+
+    suspend fun markRead(): MarkReadResponse = authed("/api/messages/read", "{}")
+
+    // Partenaire id = JWT `sub`; the app has no other copy of it.
+    suspend fun myUserId(): String {
+        val payload =
+            current()
+                .session.accessToken
+                .substringAfter('.')
+                .substringBefore('.')
+        val claims = Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT_OPTIONAL).decode(payload)
+        return ApiJson
+            .parseToJsonElement(claims.decodeToString())
+            .jsonObject
+            .getValue("sub")
+            .jsonPrimitive.content
+    }
+
     suspend fun theme(): ThemeResponse = send(current().instanceUrl, "/api/theme")
 
     private suspend inline fun <reified B : Any> start(
@@ -78,15 +109,18 @@ class OpenLoveClient(
 
     private suspend fun current() = store.read() ?: error("not paired")
 
-    private suspend inline fun <reified T> authed(path: String): T {
+    private suspend inline fun <reified T> authed(
+        path: String,
+        json: String? = null,
+    ): T {
         val stale = current()
         try {
-            return send(stale.instanceUrl, path, token = stale.session.accessToken)
+            return send(stale.instanceUrl, path, json, stale.session.accessToken)
         } catch (e: ApiException) {
             if (e.status != 401) throw e
         }
         val fresh = refresh(stale)
-        return send(fresh.instanceUrl, path, token = fresh.session.accessToken)
+        return send(fresh.instanceUrl, path, json, fresh.session.accessToken)
     }
 
     private suspend fun refresh(stale: StoredSession): StoredSession =
@@ -114,6 +148,7 @@ class OpenLoveClient(
                 http.get(instanceUrl + path) { token?.let { header(HttpHeaders.Authorization, "Bearer $it") } }
             } else {
                 http.post(instanceUrl + path) {
+                    token?.let { header(HttpHeaders.Authorization, "Bearer $it") }
                     contentType(ContentType.Application.Json)
                     setBody(json)
                 }

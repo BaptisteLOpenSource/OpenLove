@@ -19,10 +19,16 @@ export const messagesQuery = z.object({
     .optional(),
 });
 
+const messageId = z.string().regex(/^\d+$/);
+
 export const messagesResponse = z.strictObject({
   items: z.array(message),
-  nextCursor: z.string().regex(/^\d+$/).nullable(),
+  nextCursor: messageId.nullable(),
+  // last Message the other Partenaire read; null = never
+  partnerReadId: messageId.nullable(),
 });
+
+export const markReadResponse = z.strictObject({ lastReadId: messageId.nullable() });
 
 const sample = {
   id: "42",
@@ -33,12 +39,12 @@ const sample = {
 
 export const examples = {
   valid: [
-    { items: [sample], nextCursor: "42" },
-    { items: [], nextCursor: null },
+    { items: [sample], nextCursor: "42", partnerReadId: "42" },
+    { items: [], nextCursor: null, partnerReadId: null },
   ],
   invalid: [
-    { items: [sample] },
-    { items: [{ ...sample, body: 1 }], nextCursor: null },
-    { items: [{ ...sample, body: undefined }], nextCursor: null },
+    { items: [sample], partnerReadId: null },
+    { items: [{ ...sample, body: 1 }], nextCursor: null, partnerReadId: null },
+    { items: [{ ...sample, body: undefined }], nextCursor: null, partnerReadId: null },
   ],
 };

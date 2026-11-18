@@ -103,6 +103,10 @@
     "title": "Messages",
     "empty": "Aucun message pour l'instant.",
     "placeholder": "Écrire un message",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "loadOlder": "Messages plus anciens",
+    "seen": "Vu",
+    "typing": "En train d'écrire...",
+    "sendFailed": "Envoi impossible, réessayez."
   }
 }
