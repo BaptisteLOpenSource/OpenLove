@@ -29,7 +29,7 @@ test("install.md mentions every env key", () => {
 
 test("every env key has its own heading in the wiki installer guide", () => {
   const wiki = readFileSync(
-    join(import.meta.dirname, "../../../../site/src/content/docs/installer/index.mdx"),
+    join(import.meta.dirname, "../../../../site/src/content/docs/wiki/installer/index.mdx"),
     "utf8",
   );
   for (const key of Object.keys(envSchema.shape)) expect(wiki).toContain(`\n## ${key}\n`);
