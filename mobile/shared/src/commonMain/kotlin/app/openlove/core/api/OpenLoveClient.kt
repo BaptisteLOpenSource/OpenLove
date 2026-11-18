@@ -98,7 +98,8 @@ class OpenLoveClient(
         store.write(StoredSession(instanceUrl, session))
     }
 
-    private suspend fun current() = store.read() ?: error("not paired")
+    // Same signal as a refused refresh: callers handle one 401, not a crash.
+    private suspend fun current() = store.read() ?: throw ApiException(401, "unauthorized", "not paired")
 
     private suspend inline fun <reified T> authed(
         path: String,
