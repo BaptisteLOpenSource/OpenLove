@@ -7,3 +7,7 @@ plugins {
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.sqldelight) apply false
 }
+
+allprojects {
+    dependencyLocking { lockAllConfigurations() }
+}
