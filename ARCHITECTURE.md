@@ -58,7 +58,8 @@ Business rule needing a DB to test = rule leaked out of `domain/`.
 - `withContract({input?, output, auth: 'partner' | 'public'}, handler)`.
 - Envelope `{data: T} | {error: {code, message}}`, codes `unauthorized | forbidden |
   not_couple_member | validation_failed | not_found | rate_limited | unavailable | internal`,
-  semantic HTTP status (`not_couple_member` = 403: valid session, no Couple).
+  semantic HTTP status (`not_couple_member` = 403, only in a race: removing a membership strips
+  the role claim, so the call answers 401 `unauthorized`, ADR 0011).
 - Pagination: cursor `{items, nextCursor}` on chat messages only (cap 100, default 50).
 - No versioning: `/api/*` = v1. Contracts are the compatibility promise to Android: a breaking
   schema change fails the Android contract test.

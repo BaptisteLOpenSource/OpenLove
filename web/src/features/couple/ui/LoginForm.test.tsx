@@ -23,15 +23,15 @@ test("renders labelled fields from fr messages, no alert", () => {
   expect(screen.queryByRole("alert")).toBeNull();
 });
 
-test("refused state shows the refused alert", async () => {
-  const action = vi.fn(async () => ({ error: "refused" as const }));
+test("invalid state shows the invalid alert", async () => {
+  const action = vi.fn(async () => ({ error: "invalid" as const }));
   renderForm(action);
   fireEvent.change(screen.getByLabelText(fr.login.email), {
     target: { value: "x@example.com" },
   });
   fireEvent.change(screen.getByLabelText(fr.login.password), { target: { value: "pw" } });
   fireEvent.click(screen.getByRole("button", { name: fr.login.submit }));
-  expect((await screen.findByRole("alert")).textContent).toBe(fr.login.refused);
+  expect((await screen.findByRole("alert")).textContent).toBe(fr.login.invalid);
   expect(action).toHaveBeenCalled();
 });
 

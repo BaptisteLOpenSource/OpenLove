@@ -1,5 +1,6 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
+import { LOGIN_FLOOR_MS } from "../domain/limits";
 import { signIn, signOut } from "./auth";
 import { hitRateLimit } from "./rateLimit";
 
@@ -31,10 +32,9 @@ const form = (email: string, password = "pw") => {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(hitRateLimit).mockResolvedValue(true);
-  signInWithPassword.mockResolvedValue({ error: null });
-  partnerOf.mockResolvedValue({
-    ok: true,
-    partner: { userId: "u", coupleId: "c", role: "partner_a" },
+  signInWithPassword.mockResolvedValue({
+    data: { user: { app_metadata: { role: "partner_a" } } },
+    error: null,
   });
 });
 
@@ -56,11 +56,17 @@ test("auth error -> invalid", async () => {
   expect(partnerOf).not.toHaveBeenCalled();
 });
 
-test("non-member -> signed out and refused", async () => {
-  partnerOf.mockResolvedValue({ ok: false, code: "not_couple_member" });
-  expect(await signIn({}, form("a@example.com"))).toEqual({ error: "refused" });
-  expect(partnerOf).toHaveBeenCalledWith(sb);
+test("no role claim -> invalid (same as bad password), signed out", async () => {
+  signInWithPassword.mockResolvedValue({ data: { user: { app_metadata: {} } }, error: null });
+  expect(await signIn({}, form("a@example.com"))).toEqual({ error: "invalid" });
   expect(authSignOut).toHaveBeenCalled();
+});
+
+test("failure answers only after the floor", async () => {
+  signInWithPassword.mockResolvedValue({ error: new Error("bad creds") });
+  const started = Date.now();
+  await signIn({}, form("a@example.com"));
+  expect(Date.now() - started).toBeGreaterThanOrEqual(LOGIN_FLOOR_MS - 10);
 });
 
 test("member -> redirect to /", async () => {
