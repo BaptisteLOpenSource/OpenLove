@@ -6,8 +6,8 @@ declare module "zod" {
   }
 }
 
-// shortcut: placeholder host until wiki.<domain> is live, swap here only
-const WIKI_URL = "https://wiki.example.org";
+// Wiki and presentation page: GitHub Pages on the author's domain (site/).
+const WIKI_URL = "https://openlove.baptisteledev.fr/wiki";
 const guide = (anchor: string) => `${WIKI_URL}/installer/#${anchor}`;
 
 export const envSchema = z.object({
