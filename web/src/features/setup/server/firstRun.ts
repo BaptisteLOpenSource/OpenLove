@@ -1,7 +1,10 @@
 "use server";
+import { createHash, timingSafeEqual } from "node:crypto";
+
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { env } from "@/shared/env";
 import { adminClient, serverClient } from "@/shared/supabase/server";
 
 import type { FirstRunState } from "../firstRunState";
@@ -24,6 +27,12 @@ export async function createFirstCouple(
   _prev: FirstRunState,
   form: FormData,
 ): Promise<FirstRunState> {
+  // Hash both sides: equal length for timingSafeEqual, no length leak.
+  const digest = (s: string) => createHash("sha256").update(s).digest();
+  const given = form.get("setupToken");
+  if (typeof given !== "string" || !timingSafeEqual(digest(given), digest(env().SETUP_TOKEN))) {
+    return { error: "token" };
+  }
   const parsed = input.safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: "invalid" };
   const { email, password, partnerAName, partnerBName, startDate, seed } = parsed.data;

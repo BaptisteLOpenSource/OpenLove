@@ -94,6 +94,13 @@ La sortie ressemble à `<génère-ta-valeur>` : 44 caractères qui se terminent 
 - Copiez la sortie dans votre gestionnaire de mots de passe.
 - Ne la générez qu'une fois. La perdre rend les Messages illisibles.
 
+## SETUP_TOKEN
+
+Secret demandé par le formulaire de premier lancement `/setup`. Il empêche un inconnu de créer le Couple à votre place.
+
+- 32 caractères minimum. Générez-le comme [MESSAGE_ENCRYPTION_KEY](#message_encryption_key), avec une autre valeur.
+- Gardez-le privé. Il ne sert qu'au premier lancement.
+
 ## NEXT_PUBLIC_SUPABASE_URL
 
 Valeur : même valeur que [SUPABASE_URL](#supabase_url). Elle est exposée au navigateur.

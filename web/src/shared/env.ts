@@ -29,6 +29,10 @@ export const envSchema = z.object({
     .base64()
     .refine((v) => Buffer.from(v, "base64").length === 32)
     .meta({ docUrl: guide("message_encryption_key") }),
+  SETUP_TOKEN: z
+    .string()
+    .min(32)
+    .meta({ docUrl: guide("setup_token") }),
 });
 
 export const publicEnvSchema = envSchema.pick({

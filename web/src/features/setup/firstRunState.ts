@@ -1,1 +1,1 @@
-export type FirstRunState = { error?: "invalid" | "exists" };
+export type FirstRunState = { error?: "invalid" | "exists" | "token" };
