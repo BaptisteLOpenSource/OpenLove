@@ -15,14 +15,16 @@ const { realtime } = vi.hoisted(() => {
       handlers[event] = fn;
       return channel;
     },
-    subscribe: () => channel,
+    subscribe: vi.fn(() => channel),
     send: async () => "ok",
   };
-  return { realtime: { channel, removeChannel: async () => "ok" } };
+  const setAuth = vi.fn(async () => {});
+  return { realtime: { channel, setAuth, removeChannel: async () => "ok" } };
 });
 vi.mock("@/shared/supabase/browser", () => ({
   browserClient: () => ({
     channel: () => realtime.channel,
+    realtime: { setAuth: realtime.setAuth },
     removeChannel: realtime.removeChannel,
   }),
 }));
@@ -128,4 +130,16 @@ test("burst of message broadcasts -> one mark-read after the debounce", async ()
   await waitFor(() => expect(reads()).toBe(2), { timeout: 2000 });
   await new Promise((r) => setTimeout(r, 1200));
   expect(reads()).toBe(2);
+});
+
+test("joins the private channel only once realtime auth is set", async () => {
+  vi.stubGlobal("fetch", fetchRouter(() => undefined));
+  let release = () => {};
+  realtime.setAuth.mockImplementationOnce(() => new Promise<void>((r) => (release = r)));
+  realtime.channel.subscribe.mockClear();
+  render(<Chat initial={{ items: [], nextCursor: null, partnerReadId: null, me: "me" }} coupleId="c" />);
+
+  expect(realtime.channel.subscribe).not.toHaveBeenCalled();
+  release();
+  await waitFor(() => expect(realtime.channel.subscribe).toHaveBeenCalledOnce());
 });

@@ -77,12 +77,15 @@ export function useChat(initial: Page, coupleId: string) {
         setTyping(true);
         clearTimeout(typingTimer.current);
         typingTimer.current = setTimeout(() => setTyping(false), TYPING_SHOWN_MS);
-      })
-      // re-SUBSCRIBED after a drop: signals were missed, catch up
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") sync();
       });
     channelRef.current = channel;
+    // Join without JWT is refused on a private channel, then retried: signals lost meanwhile.
+    void sb.realtime.setAuth().then(() =>
+      // re-SUBSCRIBED after a drop: signals were missed, catch up
+      channel.subscribe((status) => {
+        if (status === "SUBSCRIBED") sync();
+      }),
+    );
     sync();
     document.addEventListener("visibilitychange", sync);
     return () => {
