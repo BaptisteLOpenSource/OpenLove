@@ -1,5 +1,6 @@
 package app.openlove
 
+import app.openlove.chat.ChatModel
 import app.openlove.core.api.ApiException
 import app.openlove.core.api.HomeResponse
 import app.openlove.core.api.OpenLoveClient
@@ -19,6 +20,11 @@ sealed interface Screen {
 
     data class Home(
         val home: HomeResponse,
+    ) : Screen
+
+    data class Chat(
+        val home: Home,
+        val chat: ChatModel,
     ) : Screen
 
     data object Unreachable : Screen
@@ -49,6 +55,14 @@ class AppModel(
             } catch (e: IOException) {
                 Screen.Unreachable
             }
+    }
+
+    fun openChat() {
+        (_screen.value as? Screen.Home)?.let { _screen.value = Screen.Chat(it, ChatModel(client)) }
+    }
+
+    fun back() {
+        (_screen.value as? Screen.Chat)?.let { _screen.value = it.home }
     }
 
     suspend fun pair(raw: String) {

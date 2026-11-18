@@ -36,7 +36,7 @@ Business language is French (UI and conversation). Code identifiers in English, 
 | **Message** | `message` | Chat entry: text, Média, GIF or Lieu partagé. Text encrypted at rest. | post |
 | **Média** | `media` | Image stored through `MediaStore` in the couple's own storage. | file, upload |
 | **Lieu partagé** | `sharedPlace` | Message carrying coordinates + label, preview map, opens in Maps. | location |
-| **Vu** | `readAt` | Read receipt on a Message. | seen flag |
+| **Vu** | `partnerReadId` | Last Message the other Partenaire read (`message_reads`, one row per Partenaire). Shown under the last own Message read. | seen flag |
 | **En train d'écrire** | `typing` | Ephemeral typing signal. | |
 
 ## Collections (from source glossary, kept)

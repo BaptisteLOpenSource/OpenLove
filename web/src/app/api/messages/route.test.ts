@@ -8,20 +8,21 @@ const sendMessage = vi.fn();
 
 vi.mock("@/shared/supabase/server", () => ({
   partnerOf: () => partnerOf(),
-  serverClient: async () => ({}),
+  serverClient: async () => sb,
 }));
 vi.mock("@/features/messages/server/messages", () => ({
   listMessages: (...a: unknown[]) => listMessages(...a),
   sendMessage: (...a: unknown[]) => sendMessage(...a),
 }));
 
+const sb = { tag: "caller-client" };
 const partner = { userId: "u", coupleId: "c", role: "partner_a" };
 const get = (q: string) => GET(new Request(`http://x/api/messages${q}`));
 
 beforeEach(() => {
   vi.clearAllMocks();
   partnerOf.mockResolvedValue({ ok: true, partner });
-  listMessages.mockResolvedValue({ items: [], nextCursor: null });
+  listMessages.mockResolvedValue({ items: [], nextCursor: null, partnerReadId: null });
 });
 
 test("GET without session -> 401", async () => {
@@ -37,7 +38,7 @@ test("GET limit above 100 or below 1 -> 400, never reaches the store", async () 
 
 test("GET defaults the limit and passes the cursor", async () => {
   expect((await get("?cursor=12")).status).toBe(200);
-  expect(listMessages).toHaveBeenCalledWith({ limit: 50, cursor: "12" });
+  expect(listMessages).toHaveBeenCalledWith({ limit: 50, cursor: "12" }, "u", sb);
 });
 
 test("POST empty text -> 400; valid -> 200 with the Message", async () => {
@@ -60,5 +61,5 @@ test("POST empty text -> 400; valid -> 200 with the Message", async () => {
   const res = await post({ text: "hi" });
   expect(res.status).toBe(200);
   expect((await res.json()).data).toEqual(msg);
-  expect(sendMessage).toHaveBeenCalledWith(partner, "hi");
+  expect(sendMessage).toHaveBeenCalledWith(partner, "hi", sb);
 });

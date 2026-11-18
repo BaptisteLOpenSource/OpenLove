@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 
 import { localAdmin, SEED, seed } from "../../../../scripts/seed";
-import { listMessages, sendMessage } from "./messages";
+import { listMessages, markRead, sendMessage } from "./messages";
 
 vi.mock("server-only", () => ({}));
 
@@ -40,7 +40,7 @@ describe.skipIf(!up)("messages", () => {
     const sent = await sendMessage({ userId: a.userId, coupleId }, text, a.sb);
     expect(sent.body).toBe(text);
 
-    const page = await listMessages({ limit: 100 }, b.sb);
+    const page = await listMessages({ limit: 100 }, b.userId, b.sb);
     expect(page.items.find((m) => m.id === sent.id)?.body).toBe(text);
 
     const raw = await localAdmin().from("messages").select().eq("id", sent.id).single();
@@ -55,10 +55,10 @@ describe.skipIf(!up)("messages", () => {
       (await sendMessage(me, "p2", a.sb)).id,
       (await sendMessage(me, "p3", a.sb)).id,
     ];
-    const first = await listMessages({ limit: 2 }, a.sb);
+    const first = await listMessages({ limit: 2 }, a.userId, a.sb);
     expect(first.items.map((m) => m.id)).toEqual([ids[2], ids[1]]);
     expect(first.nextCursor).not.toBeNull();
-    const second = await listMessages({ limit: 2, cursor: first.nextCursor ?? "" }, a.sb);
+    const second = await listMessages({ limit: 2, cursor: first.nextCursor ?? "" }, a.userId, a.sb);
     expect(second.items[0]?.id).not.toBe(ids[1]);
     expect(second.items.map((m) => m.id)).toContain(ids[0]);
   });
@@ -73,8 +73,24 @@ describe.skipIf(!up)("messages", () => {
       .single();
     expect(bad.error).toBeNull();
 
-    const ids = (await listMessages({ limit: 100 }, a.sb)).items.map((m) => m.id);
+    const ids = (await listMessages({ limit: 100 }, a.userId, a.sb)).items.map((m) => m.id);
     expect(ids).toContain(ok.id);
     expect(ids).not.toContain(String(bad.data?.id));
+  });
+
+  test("b marks read: a sees Vu on the newest message; b cannot write a's row", async () => {
+    const a = await signedIn(SEED.emails.a);
+    const b = await signedIn(SEED.emails.b);
+    const sent = await sendMessage({ userId: a.userId, coupleId }, "vu", a.sb);
+    await markRead(b.sb);
+
+    const page = await listMessages({ limit: 100 }, a.userId, a.sb);
+    expect(page.partnerReadId).not.toBeNull();
+    expect(BigInt(page.partnerReadId ?? "0")).toBeGreaterThanOrEqual(BigInt(sent.id));
+
+    const forged = await b.sb
+      .from("message_reads")
+      .upsert({ couple_id: coupleId, partner_id: a.userId, last_read_id: sent.id });
+    expect(forged.error).not.toBeNull();
   });
 });

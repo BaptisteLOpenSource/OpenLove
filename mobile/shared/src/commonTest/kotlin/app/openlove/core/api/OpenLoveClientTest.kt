@@ -38,6 +38,7 @@ private val s1 = Session("a1", "r1", 100)
 private val s2 = Session("a2", "r2", 200)
 private const val SESSION2 = """{"data":{"accessToken":"a2","refreshToken":"r2","expiresAt":200}}"""
 private const val HOME = """{"data":{"milestone":{"years":1,"months":2,"days":3,"totalDays":430},"upcomingDate":null}}"""
+private const val MESSAGE = """{"data":{"id":"7","authorId":"u","body":"Salut","createdAt":"2026-11-18T10:00:00.000Z"}}"""
 private const val UNAUTHORIZED = """{"error":{"code":"unauthorized","message":"nope"}}"""
 
 private fun MockRequestHandleScope.reply(
@@ -176,6 +177,62 @@ class OpenLoveClientTest {
             calls.awaitAll().forEach {
                 assertEquals(401, (it.exceptionOrNull() as ApiException).status)
             }
+        }
+
+    @Test
+    fun sendMessagePostsTextWithBearer() =
+        runTest {
+            var auth: String? = null
+            var body = ""
+            val c =
+                client(paired) {
+                    auth = it.headers[HttpHeaders.Authorization]
+                    body = it.body.toByteArray().decodeToString()
+                    reply(HttpStatusCode.OK, MESSAGE)
+                }
+            assertEquals("7", c.sendMessage("Salut").id)
+            assertEquals("Bearer a1", auth)
+            assertEquals("""{"text":"Salut"}""", body)
+        }
+
+    @Test
+    fun sendMessage401RefreshesAndRetriesPost() =
+        runTest {
+            val auths = mutableListOf<String?>()
+            val c =
+                client(paired) {
+                    if (it.url.encodedPath == "/api/session/refresh") {
+                        reply(HttpStatusCode.OK, SESSION2)
+                    } else {
+                        auths += it.headers[HttpHeaders.Authorization]
+                        if (auths.size == 1) reply(HttpStatusCode.Unauthorized, UNAUTHORIZED) else reply(HttpStatusCode.OK, MESSAGE)
+                    }
+                }
+            c.sendMessage("Salut")
+            assertEquals(listOf<String?>("Bearer a1", "Bearer a2"), auths)
+        }
+
+    @Test
+    fun messagesPassesCursor() =
+        runTest {
+            val urls = mutableListOf<String>()
+            val c =
+                client(paired) {
+                    urls += it.url.toString()
+                    reply(HttpStatusCode.OK, """{"data":{"items":[],"nextCursor":null,"partnerReadId":null}}""")
+                }
+            c.messages()
+            c.messages("42")
+            assertEquals(listOf("$BASE/api/messages", "$BASE/api/messages?cursor=42"), urls)
+        }
+
+    @Test
+    fun myUserIdReadsJwtSub() =
+        runTest {
+            // payload = {"sub":"me"}
+            val c =
+                client(FakeSessionStore(StoredSession(BASE, Session("h.eyJzdWIiOiJtZSJ9.s", "r", 100)))) { reply(HttpStatusCode.OK, HOME) }
+            assertEquals("me", c.myUserId())
         }
 
     @Test

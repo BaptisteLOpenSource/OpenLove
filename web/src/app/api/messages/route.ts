@@ -9,10 +9,10 @@ import { withContract } from "@/shared/http/withContract";
 
 export const GET = withContract(
   { input: messagesQuery, output: messagesResponse, auth: "partner" },
-  (query) => listMessages(query),
+  (query, { partner, sb }) => listMessages(query, partner.userId, sb),
 );
 
 export const POST = withContract(
   { input: sendMessageInput, output: message, auth: "partner" },
-  ({ text }, { partner }) => sendMessage(partner, text),
+  ({ text }, { partner, sb }) => sendMessage(partner, text, sb),
 );
