@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import type { FirstRunState } from "../firstRunState";
 
 const FIELDS = [
+  { name: "setupToken", type: "password", autoComplete: "off" },
   { name: "email", type: "email", autoComplete: "email" },
   { name: "password", type: "password", autoComplete: "new-password", minLength: 8 },
   { name: "partnerAName", type: "text", autoComplete: "off", maxLength: 50 },

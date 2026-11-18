@@ -8,7 +8,10 @@ const rpc = vi.fn();
 const signInWithPassword = vi.fn();
 const hasCouple = vi.fn();
 
+const TOKEN = "s".repeat(32);
+
 vi.mock("server-only", () => ({}));
+vi.mock("@/shared/env", () => ({ env: () => ({ SETUP_TOKEN: TOKEN }) }));
 vi.mock("./couple", () => ({ hasCouple: () => hasCouple() }));
 vi.mock("@/shared/supabase/server", () => ({
   adminClient: () => ({ auth: { admin: { createUser, deleteUser } }, rpc }),
@@ -23,6 +26,7 @@ vi.mock("next/navigation", () => ({
 function form(over: Record<string, string> = {}) {
   const f = new FormData();
   const base = {
+    setupToken: TOKEN,
     email: "alex@example.com",
     password: "12345678",
     partnerAName: " Alex ",
@@ -76,6 +80,25 @@ test.each([
   ["bad date", { startDate: "2020-13-45" }],
 ])("%s -> invalid, nothing created", async (_n, over) => {
   expect(await createFirstCouple({}, form(over))).toEqual({ error: "invalid" });
+  expect(createUser).not.toHaveBeenCalled();
+});
+
+test.each([
+  ["wrong", { setupToken: "t".repeat(32) }],
+  ["short", { setupToken: "x" }],
+  ["empty", { setupToken: "" }],
+  ["padded", { setupToken: ` ${TOKEN} ` }],
+])("%s token -> token, nothing touched", async (_n, over) => {
+  expect(await createFirstCouple({}, form(over))).toEqual({ error: "token" });
+  expect(hasCouple).not.toHaveBeenCalled();
+  expect(createUser).not.toHaveBeenCalled();
+  expect(rpc).not.toHaveBeenCalled();
+});
+
+test("missing token field -> token, nothing touched", async () => {
+  const f = form();
+  f.delete("setupToken");
+  expect(await createFirstCouple({}, f)).toEqual({ error: "token" });
   expect(createUser).not.toHaveBeenCalled();
 });
 

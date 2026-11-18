@@ -18,7 +18,8 @@
       "SUPABASE_SERVICE_ROLE_KEY": "Clé service_role : tableau de bord Supabase, Project Settings > API. Secrète, serveur uniquement.",
       "NEXT_PUBLIC_SUPABASE_URL": "Même valeur que SUPABASE_URL, exposée au navigateur.",
       "NEXT_PUBLIC_SUPABASE_ANON_KEY": "Même valeur que SUPABASE_ANON_KEY, exposée au navigateur.",
-      "MESSAGE_ENCRYPTION_KEY": "Clé AES-256 du chat: 32 octets en base64 (openssl rand -base64 32). Secrète, jamais en base. La perdre rend les Messages illisibles."
+      "MESSAGE_ENCRYPTION_KEY": "Clé AES-256 du chat: 32 octets en base64 (openssl rand -base64 32). Secrète, jamais en base. La perdre rend les Messages illisibles.",
+      "SETUP_TOKEN": "Secret demandé par le formulaire de premier lancement : empêche un inconnu de créer le Couple. 32 caractères minimum (openssl rand -base64 32). Gardez-le privé."
     },
     "checklistTitle": "Checklist de sécurité du tableau de bord hébergé",
     "steps": {
@@ -60,6 +61,8 @@
       "seed": "Couleur de l'application",
       "submit": "Créer le couple",
       "invalid": "Vérifiez les champs : e-mail valide, mot de passe de 8 caractères minimum, prénoms et date renseignés.",
+      "setupToken": "Jeton de configuration (variable SETUP_TOKEN)",
+      "token": "Jeton de configuration incorrect.",
       "exists": "Un couple existe déjà sur cette instance."
     }
   },

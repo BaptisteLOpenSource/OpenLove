@@ -33,6 +33,7 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "b");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "a");
+  vi.stubEnv("SETUP_TOKEN", "x".repeat(32));
 });
 
 const at = (path: string) => proxy(new NextRequest(`http://localhost${path}`));
