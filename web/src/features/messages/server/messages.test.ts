@@ -82,7 +82,7 @@ describe.skipIf(!up)("messages", () => {
     const a = await signedIn(SEED.emails.a);
     const b = await signedIn(SEED.emails.b);
     const sent = await sendMessage({ userId: a.userId, coupleId }, "vu", a.sb);
-    await markRead({ userId: b.userId, coupleId }, b.sb);
+    await markRead(b.sb);
 
     const page = await listMessages({ limit: 100 }, a.userId, a.sb);
     expect(page.partnerReadId).not.toBeNull();

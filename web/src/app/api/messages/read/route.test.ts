@@ -38,5 +38,5 @@ test("POST marks read as the caller and returns lastReadId", async () => {
   const res = await post();
   expect(res.status).toBe(200);
   expect((await res.json()).data).toEqual({ lastReadId: "42" });
-  expect(markRead).toHaveBeenCalledWith(partner, {});
+  expect(markRead).toHaveBeenCalledWith({});
 });

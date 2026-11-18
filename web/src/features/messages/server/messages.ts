@@ -78,26 +78,9 @@ export async function listMessages(
   };
 }
 
-// id from the server, never from the client: a Partenaire cannot mark future Messages read
-export async function markRead(
-  partner: Pick<Partner, "userId" | "coupleId">,
-  sb?: SupabaseClient,
-): Promise<{ lastReadId: string | null }> {
-  const client = sb ?? (await serverClient());
-  const { data, error } = await client
-    .from("messages")
-    .select("id")
-    .order("id", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+// The RPC picks the newest id and never moves read backward: clients cannot write message_reads.
+export async function markRead(sb?: SupabaseClient): Promise<{ lastReadId: string | null }> {
+  const { data, error } = await (sb ?? (await serverClient())).rpc("mark_message_read");
   if (error) throw error;
-  if (!data) return { lastReadId: null };
-  const { error: upsertError } = await client
-    .from("message_reads")
-    .upsert(
-      { couple_id: partner.coupleId, partner_id: partner.userId, last_read_id: data.id },
-      { onConflict: "couple_id,partner_id" },
-    );
-  if (upsertError) throw upsertError;
-  return { lastReadId: String(data.id) };
+  return { lastReadId: data == null ? null : String(data) };
 }
