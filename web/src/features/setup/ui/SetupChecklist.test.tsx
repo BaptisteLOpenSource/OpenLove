@@ -36,6 +36,13 @@ test("shows each key with its status and never a value", () => {
   expect(document.body.textContent).not.toContain("nope");
 });
 
+test("each row links to its wiki guide anchor", () => {
+  const { container } = renderItems(checkEnv(envSchema, {}));
+
+  const row = within(container).getByText("MESSAGE_ENCRYPTION_KEY").closest("li") as HTMLElement;
+  expect(row.querySelector("a")?.getAttribute("href")).toMatch(/#message_encryption_key$/);
+});
+
 test("a var without message falls back to the generic how-to", () => {
   renderItems(checkEnv(envSchema.extend({ NEW_VAR: envSchema.shape.SUPABASE_ANON_KEY }), {}));
 

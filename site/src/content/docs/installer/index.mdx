@@ -1,23 +1,41 @@
 ---
 title: Installer OpenLove
-description: Guide utilisateur. Projet Supabase et secrets, sur Windows, macOS et Linux.
+description: Guide utilisateur. Vercel, projet Supabase, secrets et Firebase, sur Windows, macOS et Linux.
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Ce guide prépare les valeurs à coller dans la configuration de votre instance OpenLove.
-Rien n'est à installer. Une seule étape demande un terminal, déjà présent sur votre système : PowerShell (Windows), Terminal (macOS, Linux).
+Ce guide prépare votre instance OpenLove sans installer de logiciel.
+Une seule étape demande un terminal, déjà présent sur votre système : PowerShell (Windows), Terminal (macOS, Linux).
 
 :::caution
 Ne partagez jamais une valeur secrète, ni dans un message, ni dans une capture d'écran.
 :::
 
-## 1. Créer le projet Supabase
+## 1. Vercel
 
-1. Ouvrez [supabase.com](https://supabase.com) et créez un compte.
-2. Créez un nouveau projet. Notez le mot de passe de la base dans votre gestionnaire de mots de passe.
+1. Forkez le dépôt OpenLove sur votre compte GitHub.
+2. Dans Vercel, importez votre fork : **Add New > Project**.
+3. Renseignez **Root Directory** : `web`.
+4. Ouvrez **Build and Deployment** et activez **Include files outside the root directory in the Build Step**. L'application lit `design/tokens.json` hors de `web/`. Sans cette option, le build échoue.
+
+Ne lancez pas encore le déploiement : les variables viennent aux étapes 2 et 3.
+
+## 2. Supabase
+
+1. Ouvrez [supabase.com](https://supabase.com), créez un compte et un nouveau projet.
+2. Notez le mot de passe de la base dans votre gestionnaire de mots de passe.
 3. Attendez la fin de l'initialisation du projet.
-4. Ouvrez **Project Settings > API**. Les valeurs ci-dessous s'y trouvent.
+4. Appliquez les migrations : dans **SQL Editor**, ouvrez chaque fichier de `supabase/migrations/` de votre fork, dans l'ordre de leur nom, collez-le, puis cliquez sur **Run**. Ne sautez aucun fichier.
+5. Ouvrez **Project Settings > API**. Les valeurs des étapes suivantes s'y trouvent.
+
+:::tip
+Avec la Supabase CLI (développeurs), la même étape s'écrit `supabase link --project-ref <ref>` puis `supabase db push`.
+:::
+
+## 3. Secrets et variables
+
+Les variables ci-dessous vont dans **Settings > Environment Variables** de Vercel. Après les avoir toutes saisies, redéployez.
 
 ## SUPABASE_URL
 
@@ -76,13 +94,33 @@ La sortie ressemble à `<génère-ta-valeur>` : 44 caractères qui se terminent 
 - Copiez la sortie dans votre gestionnaire de mots de passe.
 - Ne la générez qu'une fois. La perdre rend les Messages illisibles.
 
-## Variables NEXT_PUBLIC_
+## NEXT_PUBLIC_SUPABASE_URL
 
-L'application attend aussi deux variables pour le navigateur. Elles prennent les mêmes valeurs que :
+Valeur : même valeur que [SUPABASE_URL](#supabase_url). Elle est exposée au navigateur.
 
-- `NEXT_PUBLIC_SUPABASE_URL` : même valeur que [SUPABASE_URL](#supabase_url).
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` : même valeur que [SUPABASE_ANON_KEY](#supabase_anon_key).
+## NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-## Étape suivante
+Valeur : même valeur que [SUPABASE_ANON_KEY](#supabase_anon_key). Elle est exposée au navigateur.
 
-Renseignez ces cinq variables dans la configuration d'hébergement de votre instance, puis ouvrez la page `/setup` : chaque variable doit s'afficher en vert.
+## 4. Firebase (notifications, à venir)
+
+Les notifications push passent par Firebase Cloud Messaging. Cette version n'en a pas encore besoin : aucune variable Firebase n'est demandée par `/setup`.
+
+1. Ouvrez [console.firebase.google.com](https://console.firebase.google.com) et créez un projet.
+2. Gardez le projet pour les notifications. Les clés seront ajoutées à ce guide et à `/setup` avec la fonctionnalité qui les utilise.
+
+## 5. Checklist de sécurité hébergée
+
+Cette checklist se fait dans le tableau de bord Supabase. Aucun de ces réglages n'est dans le code : il faut les appliquer à la main sur votre projet.
+
+- [ ] **Auth > Providers > Email** : désactivez les inscriptions une fois les deux partenaires créés.
+- [ ] **Auth > Password security** : longueur minimale 8, protection contre les mots de passe fuités activée (plan Pro).
+- [ ] **Auth > Sessions** : durée de vie limitée et délai d'inactivité (plan Pro).
+- [ ] **Database > Settings** : Enforce SSL activé, restrictions réseau (allowlist). L'app utilise HTTPS, seul Postgres direct est concerné.
+- [ ] **Advisors > Security Advisor** : aucun WARN.
+
+## Étape finale : `/setup`
+
+Ouvrez la page `/setup` de votre site. Chaque variable doit afficher **OK**. Si une variable est manquante ou invalide, son lien **Guide pas à pas** ouvre la section correspondante de ce guide.
+
+Quand toutes les variables sont vertes, la page propose de créer votre couple. Finissez ensuite la checklist de la section 5.

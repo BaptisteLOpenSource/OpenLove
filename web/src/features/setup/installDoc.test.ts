@@ -26,3 +26,11 @@ test("install.md carries every step title, instruction and checklist line", () =
 test("install.md mentions every env key", () => {
   for (const key of Object.keys(envSchema.shape)) expect(doc).toContain(key);
 });
+
+test("every env key has its own heading in the wiki installer guide", () => {
+  const wiki = readFileSync(
+    join(import.meta.dirname, "../../../../site/src/content/docs/installer/index.mdx"),
+    "utf8",
+  );
+  for (const key of Object.keys(envSchema.shape)) expect(wiki).toContain(`\n## ${key}\n`);
+});
