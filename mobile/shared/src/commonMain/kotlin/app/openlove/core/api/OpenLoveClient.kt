@@ -53,6 +53,11 @@ private data class SendBody(
     val text: String,
 )
 
+@Serializable
+private data class MoodBody(
+    val mood: String,
+)
+
 class OpenLoveClient(
     private val store: SessionStore,
     private val http: HttpClient = createApiClient(),
@@ -75,6 +80,8 @@ class OpenLoveClient(
         authed("/api/messages" + (cursor?.let { "?cursor=${it.encodeURLParameter()}" } ?: ""))
 
     suspend fun sendMessage(text: String): Message = authed("/api/messages", ApiJson.encodeToString(SendBody(text)))
+
+    suspend fun setMood(mood: String): HomeResponse = authed("/api/mood", ApiJson.encodeToString(MoodBody(mood)))
 
     suspend fun markRead() {
         authed<MarkReadResponse>("/api/messages/read", "{}")

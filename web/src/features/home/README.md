@@ -12,3 +12,6 @@ Accueil: the first screen of a Partenaire. Holds the Compteur.
   day clamped to month end (31 Jan + 1 month = 29 Feb in 2024). Domain uses built-ins only.
 - Invariants (Prochaine date): private dates are hidden by RLS on `private_to`, never filtered in
   app code. Nearest date wins; ties broken by label.
+- Language: Humeur (`mood`) = one value per Partenaire per day (Couple time zone), from `moodValue`.
+  Setting it again the same day replaces it (upsert on `partner_id, day`). Both Partenaires see both.
+- Invariant (Humeur): RLS lets a Partenaire write only their own row of their Couple; reads are Couple-wide.

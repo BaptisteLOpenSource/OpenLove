@@ -63,7 +63,12 @@ private fun Content(
                 onScan = { scan(context, scope, model) },
                 onSignIn = { url, email, password -> scope.launch { model.signIn(url, email, password) } },
             )
-        is Screen.Home -> HomeScreen(screen.home, onOpenChat = model::openChat)
+        is Screen.Home ->
+            HomeScreen(
+                screen.home,
+                onOpenChat = model::openChat,
+                onSetMood = { mood -> scope.launch { model.setMood(mood) } },
+            )
         is Screen.Chat -> ChatScreen(screen.chat, onBack = model::back)
         Screen.Unreachable ->
             Centered {

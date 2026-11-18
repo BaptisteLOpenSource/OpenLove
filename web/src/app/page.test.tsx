@@ -20,6 +20,7 @@ vi.mock("@/features/home/server/getHome", () => ({
   getPartnerNames: (...a: unknown[]) => getPartnerNames(...a),
 }));
 vi.mock("@/features/couple/server/auth", () => ({ signOut: vi.fn() }));
+vi.mock("@/features/home/server/moodAction", () => ({ setMoodAction: vi.fn() }));
 vi.mock("next/navigation", () => ({
   redirect: (to: string) => {
     throw new Error(`redirect:${to}`);
@@ -35,6 +36,7 @@ beforeEach(() => {
   getHome.mockResolvedValue({
     milestone: { years: 6, months: 8, days: 5, totalDays: 2439 },
     upcomingDate: null,
+    mood: { mine: null, partner: "calm" },
   });
   getPartnerNames.mockResolvedValue({ a: "Alex", b: "Sam" });
 });
@@ -56,10 +58,11 @@ test("member -> Compteur, Prochaine date and logout button", async () => {
       {await HomePage()}
     </NextIntlClientProvider>,
   );
-  expect(getHome).toHaveBeenCalledWith(sb, "c1");
+  expect(getHome).toHaveBeenCalledWith(sb, "c1", "u");
   expect(getPartnerNames).toHaveBeenCalledWith(sb, "c1");
   expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Alex & Sam");
   expect(screen.getByText(fr.home.milestone.title)).toBeTruthy();
   expect(screen.getByText(fr.home.upcomingDate.title)).toBeTruthy();
+  expect(screen.getByText(fr.home.mood.title)).toBeTruthy();
   expect(screen.getByRole("button", { name: fr.home.logout })).toBeTruthy();
 });

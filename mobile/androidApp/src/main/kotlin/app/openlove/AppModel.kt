@@ -46,10 +46,12 @@ class AppModel(
         if (client.isPaired()) showHome() else _screen.value = Screen.Pairing()
     }
 
-    private suspend fun showHome() {
+    suspend fun setMood(mood: String) = showHome { client.setMood(mood) }
+
+    private suspend fun showHome(load: suspend () -> HomeResponse = { client.home() }) {
         _screen.value =
             try {
-                loadHome()
+                loadHome(load)
             } catch (e: ApiException) {
                 if (e.status == 401) Screen.Pairing() else Screen.Unreachable
             } catch (e: IOException) {
@@ -94,8 +96,8 @@ class AppModel(
         showHome()
     }
 
-    private suspend fun loadHome(): Screen.Home {
-        val home = Screen.Home(client.home())
+    private suspend fun loadHome(load: suspend () -> HomeResponse): Screen.Home {
+        val home = Screen.Home(load())
         try {
             client.theme().let {
                 themeCache.save(it)
