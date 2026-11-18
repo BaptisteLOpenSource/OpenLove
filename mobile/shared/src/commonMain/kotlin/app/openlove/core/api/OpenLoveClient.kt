@@ -79,7 +79,9 @@ class OpenLoveClient(
 
     suspend fun sendMessage(text: String): Message = authed("/api/messages", ApiJson.encodeToString(SendBody(text)))
 
-    suspend fun markRead(): MarkReadResponse = authed("/api/messages/read", "{}")
+    suspend fun markRead() {
+        authed<MarkReadResponse>("/api/messages/read", "{}")
+    }
 
     // Partenaire id = JWT `sub`; the app has no other copy of it.
     suspend fun myUserId(): String {

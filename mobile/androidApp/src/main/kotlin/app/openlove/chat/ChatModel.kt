@@ -92,14 +92,15 @@ class ChatModel(
             try {
                 block()
                 _state.value = _state.value.copy(failed = false)
-            } catch (e: ApiException) {
-                _state.value = _state.value.copy(failed = true)
-            } catch (e: IOException) {
-                _state.value = _state.value.copy(failed = true)
-            } catch (e: IllegalArgumentException) {
+            } catch (e: Exception) {
+                if (!e.isRecoverable()) throw e
                 _state.value = _state.value.copy(failed = true)
             }
         }
+
+    // Network, server envelope, DTO validation, malformed token: the poll must survive them.
+    private fun Exception.isRecoverable() =
+        this is ApiException || this is IOException || this is IllegalArgumentException || this is NoSuchElementException
 
     private fun setOlder(page: MessagesResponse) {
         olderCursor = page.nextCursor
