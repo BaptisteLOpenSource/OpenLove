@@ -22,7 +22,14 @@
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-%234285F4.svg?style=for-the-badge&logo=jetpackcompose&logoColor=white">
 </p>
 
-> Captures d'écran : à venir.
+<p align="center">
+  <img alt="Connexion" src="site/public/screenshots/mobile-light-login.webp" width="180">
+  <img alt="Accueil" src="site/public/screenshots/mobile-light-home.webp" width="180">
+  <img alt="Messages en temps réel avec accusé de lecture" src="site/public/screenshots/mobile-light-messages.webp" width="180">
+  <img alt="Appairage Android par QR code, thème sombre" src="site/public/screenshots/mobile-dark-settings.webp" width="180">
+</p>
+
+<p align="center"><sub>Données de démonstration (seed). Thème clair et sombre calculés depuis une seule couleur de base.</sub></p>
 
 ## Sommaire
 

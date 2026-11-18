@@ -133,11 +133,16 @@ test("burst of message broadcasts -> one mark-read after the debounce", async ()
 });
 
 test("joins the private channel only once realtime auth is set", async () => {
-  vi.stubGlobal("fetch", fetchRouter(() => undefined));
+  vi.stubGlobal(
+    "fetch",
+    fetchRouter(() => undefined),
+  );
   let release = () => {};
   realtime.setAuth.mockImplementationOnce(() => new Promise<void>((r) => (release = r)));
   realtime.channel.subscribe.mockClear();
-  render(<Chat initial={{ items: [], nextCursor: null, partnerReadId: null, me: "me" }} coupleId="c" />);
+  render(
+    <Chat initial={{ items: [], nextCursor: null, partnerReadId: null, me: "me" }} coupleId="c" />,
+  );
 
   expect(realtime.channel.subscribe).not.toHaveBeenCalled();
   release();
