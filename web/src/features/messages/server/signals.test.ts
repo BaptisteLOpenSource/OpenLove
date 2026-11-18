@@ -54,4 +54,35 @@ describe.skipIf(!up)("chat signals", () => {
 
     expect(Object.keys(payload)).toEqual(["id"]);
   }, 15_000);
+
+  test("a typing broadcast reaches b on the couple topic", async () => {
+    const a = await signedIn(SEED.emails.a);
+    const b = await signedIn(SEED.emails.b);
+    const topic = `couple:${coupleId}`;
+
+    const received = new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error("no typing in 10 s")), 10_000);
+      b.sb
+        .channel(topic, { config: { private: true } })
+        .on("broadcast", { event: "typing" }, () => {
+          clearTimeout(timer);
+          resolve();
+        })
+        .subscribe((status, err) => {
+          if (status === "CHANNEL_ERROR") reject(err);
+        });
+    });
+
+    const sender = a.sb.channel(topic, { config: { private: true } });
+    await new Promise<void>((resolve, reject) =>
+      sender.subscribe((status, err) => {
+        if (status === "SUBSCRIBED") resolve();
+        if (status === "CHANNEL_ERROR") reject(err);
+      }),
+    );
+    await new Promise((r) => setTimeout(r, 1_000));
+    await sender.send({ type: "broadcast", event: "typing", payload: {} });
+
+    await received;
+  }, 20_000);
 });

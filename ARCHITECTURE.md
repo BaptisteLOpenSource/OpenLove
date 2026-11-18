@@ -11,7 +11,7 @@ Vocabulary: [`CONTEXT.md`](CONTEXT.md).
                             ├──> /api/* (Next.js route handlers) ──> Supabase (Postgres, Auth, Storage, Realtime)
  Android (Compose) ─Bearer──┘            │                      ──> FCM (push web + Android)
                                          └──> TMDB, Nominatim, GIF provider (one client each)
- Web only: Supabase Realtime signals (new message id, typing), user JWT, RLS-scoped; content refetched via /api/chat.
+ Web only: Supabase Realtime signals (new message id, typing), user JWT, RLS-scoped; content refetched via /api/messages.
 ```
 
 - Android never talks to Supabase: `/api` is the only door ([ADR 0001](docs/decisions/0001-monorepo-api-only-backend.md)).
@@ -71,7 +71,7 @@ Business rule needing a DB to test = rule leaked out of `domain/`.
 | Push | FCM for web and Android, one `notify(recipient, payload)` | [0004](docs/decisions/0004-fcm-single-push-provider.md) |
 | Mobile login | QR pairing from `/settings` (instance URL + one-time code), manual fallback | [0005](docs/decisions/0005-qr-pairing-mobile.md) |
 | Media | `MediaStore` port: Supabase Storage (private bucket, signed URLs); Google Drive later | [0006](docs/decisions/0006-mediastore-port.md) |
-| Chat realtime | Web: Supabase Realtime signal only (message id, no content), refetch via `/api/chat`. Android: FCM wake + fetch, 3 s polling while chat open | [0001](docs/decisions/0001-monorepo-api-only-backend.md) |
+| Chat realtime | Web: Supabase Realtime signal only (message id, no content), refetch via `/api/messages`. Android: FCM wake + fetch, 3 s polling while chat open | [0001](docs/decisions/0001-monorepo-api-only-backend.md) |
 | Couple bootstrap | First run `/setup` creates partner_a + Couple (`create_couple`, service role); partner_b invite link (TTL, single use, rate limited) deferred to a follow-up issue (after #11); public signup closed | - |
 | Chat crypto | AES-256-GCM at rest, server key. Documented as at-rest, NOT E2E | - |
 | Config | One Zod env schema; `/setup` renders checklist (Vercel, Supabase, Firebase, keys) | - |

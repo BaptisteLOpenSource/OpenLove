@@ -4,7 +4,7 @@ import type { z } from "zod";
 
 import type { message, messagesQuery } from "@/shared/contracts/messages";
 import { env } from "@/shared/env";
-import { type Partner, serverClient } from "@/shared/supabase/server";
+import type { Partner } from "@/shared/supabase/server";
 
 import { decrypt, encrypt } from "./crypto";
 
@@ -35,9 +35,9 @@ const COLUMNS = "id, author_id, body_enc, created_at";
 export async function sendMessage(
   partner: Pick<Partner, "userId" | "coupleId">,
   text: string,
-  sb?: SupabaseClient,
+  sb: SupabaseClient,
 ): Promise<Message> {
-  const { data, error } = await (sb ?? (await serverClient()))
+  const { data, error } = await sb
     .from("messages")
     .insert({
       couple_id: partner.coupleId,
@@ -53,10 +53,9 @@ export async function sendMessage(
 export async function listMessages(
   { limit, cursor }: z.output<typeof messagesQuery>,
   userId: string,
-  sb?: SupabaseClient,
+  sb: SupabaseClient,
 ) {
-  const client = sb ?? (await serverClient());
-  let q = client
+  let q = sb
     .from("messages")
     .select(COLUMNS)
     .order("id", { ascending: false })
@@ -64,7 +63,7 @@ export async function listMessages(
   if (cursor) q = q.lt("id", cursor);
   const { data, error } = await q;
   if (error) throw error;
-  const { data: read, error: readError } = await client
+  const { data: read, error: readError } = await sb
     .from("message_reads")
     .select("last_read_id")
     .neq("partner_id", userId)
@@ -79,8 +78,8 @@ export async function listMessages(
 }
 
 // The RPC picks the newest id and never moves read backward: clients cannot write message_reads.
-export async function markRead(sb?: SupabaseClient): Promise<{ lastReadId: string | null }> {
-  const { data, error } = await (sb ?? (await serverClient())).rpc("mark_message_read");
+export async function markRead(sb: SupabaseClient): Promise<{ lastReadId: string | null }> {
+  const { data, error } = await sb.rpc("mark_message_read");
   if (error) throw error;
   return { lastReadId: data == null ? null : String(data) };
 }

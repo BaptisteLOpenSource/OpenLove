@@ -29,12 +29,15 @@ export function useChat(initial: Page, coupleId: string) {
 
   const loadOlder = async () => {
     if (!nextCursor) return;
-    const page = await api<Page>(`/api/messages?cursor=${nextCursor}`);
-    setItems((prev) => mergeMessages(page.items, prev));
-    setNextCursor(page.nextCursor);
+    try {
+      const page = await api<Page>(`/api/messages?cursor=${nextCursor}`);
+      setItems((prev) => mergeMessages(page.items, prev));
+      setNextCursor(page.nextCursor);
+    } catch {
+      setFailed(true);
+    }
   };
 
-  // Realtime signal (T3) will call this too; it only ever merges newest page
   const refresh = async () => {
     const page = await api<Page>("/api/messages");
     setItems((prev) => mergeMessages(prev, page.items));
