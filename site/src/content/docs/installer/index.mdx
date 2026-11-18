@@ -1,0 +1,88 @@
+---
+title: Installer OpenLove
+description: Guide utilisateur. Projet Supabase et secrets, sur Windows, macOS et Linux.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Ce guide prépare les valeurs à coller dans la configuration de votre instance OpenLove.
+Rien n'est à installer. Une seule étape demande un terminal, déjà présent sur votre système : PowerShell (Windows), Terminal (macOS, Linux).
+
+:::caution
+Ne partagez jamais une valeur secrète, ni dans un message, ni dans une capture d'écran.
+:::
+
+## 1. Créer le projet Supabase
+
+1. Ouvrez [supabase.com](https://supabase.com) et créez un compte.
+2. Créez un nouveau projet. Notez le mot de passe de la base dans votre gestionnaire de mots de passe.
+3. Attendez la fin de l'initialisation du projet.
+4. Ouvrez **Project Settings > API**. Les valeurs ci-dessous s'y trouvent.
+
+## SUPABASE_URL
+
+Valeur : **Project URL**, de la forme `https://<identifiant>.supabase.co`.
+
+Copiez-la telle quelle. Ce n'est pas un secret.
+
+## SUPABASE_ANON_KEY
+
+Valeur : la clé **anon** (publique) de la page **Project Settings > API**.
+
+Elle peut être visible par le navigateur. Ne la confondez pas avec la clé service_role.
+
+## SUPABASE_SERVICE_ROLE_KEY
+
+Valeur : la clé **service_role** de la même page.
+
+:::danger
+Cette clé contourne toutes les règles de sécurité de la base. Elle ne doit jamais apparaître côté navigateur ni dans un dépôt Git.
+:::
+
+## MESSAGE_ENCRYPTION_KEY
+
+Clé de chiffrement des Messages : 32 octets, encodés en base64.
+
+Le générateur de mots de passe Bitwarden ne produit pas ce format. Lancez la commande de votre système :
+
+<Tabs>
+	<TabItem label="Windows (PowerShell)">
+
+```powershell
+$octets = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($octets)
+[Convert]::ToBase64String($octets)
+```
+
+	</TabItem>
+	<TabItem label="macOS (Terminal)">
+
+```bash
+openssl rand -base64 32
+```
+
+	</TabItem>
+	<TabItem label="Linux (terminal)">
+
+```bash
+openssl rand -base64 32
+```
+
+	</TabItem>
+</Tabs>
+
+La sortie ressemble à `<génère-ta-valeur>` : 44 caractères qui se terminent par `=`.
+
+- Copiez la sortie dans votre gestionnaire de mots de passe.
+- Ne la générez qu'une fois. La perdre rend les Messages illisibles.
+
+## Variables NEXT_PUBLIC_
+
+L'application attend aussi deux variables pour le navigateur. Elles prennent les mêmes valeurs que :
+
+- `NEXT_PUBLIC_SUPABASE_URL` : même valeur que [SUPABASE_URL](#supabase_url).
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` : même valeur que [SUPABASE_ANON_KEY](#supabase_anon_key).
+
+## Étape suivante
+
+Renseignez ces cinq variables dans la configuration d'hébergement de votre instance, puis ouvrez la page `/setup` : chaque variable doit s'afficher en vert.
