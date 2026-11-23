@@ -201,3 +201,14 @@ test("cron: wrong or missing secret -> 401, right secret -> 200 without partner"
   expect((await call("Bearer s3cret-s3cret-s3cret")).status).toBe(200);
   expect(serverClient).not.toHaveBeenCalled();
 });
+
+test("cron: no CRON_SECRET configured -> 401 for any bearer", async () => {
+  vi.stubEnv("CRON_SECRET", undefined);
+  vi.resetModules();
+  const fresh = await import("./withContract");
+  const route = fresh.withContract({ output: z.object({}), auth: "cron" }, () => ({}));
+  const res = await route(
+    new Request("http://x/api/t", { headers: { Authorization: "Bearer x" } }),
+  );
+  expect(res.status).toBe(401);
+});

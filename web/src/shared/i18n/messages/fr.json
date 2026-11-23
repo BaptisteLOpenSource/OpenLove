@@ -29,7 +29,7 @@
       "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "Sender ID : Project Settings > Cloud Messaging (ou General) > Sender ID.",
       "NEXT_PUBLIC_FIREBASE_APP_ID": "ID de l'app Web Firebase : Project Settings > Your apps > app Web > appId.",
       "NEXT_PUBLIC_FIREBASE_VAPID_KEY": "Clé VAPID web : Project Settings > Cloud Messaging > Web Push certificates > Generate key pair.",
-      "CRON_SECRET": "Secret d'au moins 16 caractères qui protège la tâche quotidienne des Rappels. Générez-le avec : openssl rand -hex 16"
+      "CRON_SECRET": "Facultatif. Secret d'au moins 16 caractères pour la tâche quotidienne des Rappels, à brancher vous-même sur votre fork (aucun cron fourni). Générez-le avec : openssl rand -hex 16"
     },
     "fullGuide": "Guide complet d'installation (inclut la checklist de sécurité du tableau de bord hébergé)",
     "steps": {

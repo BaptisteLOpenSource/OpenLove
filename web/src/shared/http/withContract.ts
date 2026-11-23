@@ -41,7 +41,8 @@ async function authorize(
   if (mode === "public") return {};
   const token = bearerToken(req);
   if (mode === "cron") {
-    const ok = token && timingSafeEqual(digest(token), digest(env().CRON_SECRET));
+    const secret = env().CRON_SECRET;
+    const ok = token && secret && timingSafeEqual(digest(token), digest(secret));
     return ok ? {} : fail(401, "unauthorized", "unauthorized");
   }
   const mutation = req.method !== "GET" && req.method !== "HEAD";

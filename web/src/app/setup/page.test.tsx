@@ -55,9 +55,9 @@ test("renders with an empty environment", async () => {
 
   expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(fr.setup.title);
   expect(screen.getAllByText(fr.setup.status.missing)).toHaveLength(
-    Object.keys(envSchema.shape).length - FIREBASE_KEYS.length,
+    Object.keys(envSchema.shape).length - FIREBASE_KEYS.length - 1,
   );
-  expect(screen.getAllByText(fr.setup.status.optional)).toHaveLength(FIREBASE_KEYS.length);
+  expect(screen.getAllByText(fr.setup.status.optional)).toHaveLength(FIREBASE_KEYS.length + 1);
   expect(screen.queryByText(fr.setup.firstRun.title)).toBeNull();
   expect(hasCouple).not.toHaveBeenCalled();
 });

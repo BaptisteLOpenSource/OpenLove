@@ -63,6 +63,7 @@ export const envSchema = z.object({
   CRON_SECRET: z
     .string()
     .min(16)
+    .optional()
     .meta({ docUrl: guide("cron_secret") }),
 });
 

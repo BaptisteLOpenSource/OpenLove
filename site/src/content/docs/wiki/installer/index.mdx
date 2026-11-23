@@ -103,10 +103,18 @@ Secret demandé par le formulaire de premier lancement `/setup`. Il empêche un 
 
 ## CRON_SECRET
 
-Secret qui protège la tâche quotidienne des Rappels. Vercel l'envoie dans l'en-tête `Authorization: Bearer` à `/api/cron/reminders` chaque jour à 08:00 UTC.
+Facultatif. Secret qui protège la tâche quotidienne des Rappels (`/api/cron/reminders`). Aucun cron n'est fourni : sans lui, les Rappels ne partent pas.
 
-- 16 caractères minimum. Générez-le avec `openssl rand -hex 16`.
-- Gardez-le privé.
+Pour les activer sur votre fork :
+
+- Générez le secret avec `openssl rand -hex 16` (16 caractères minimum) et gardez-le privé.
+- Ajoutez un appel quotidien à `GET /api/cron/reminders` avec l'en-tête `Authorization: Bearer <CRON_SECRET>`. Sur Vercel, créez `web/vercel.json` :
+
+```json
+{ "crons": [{ "path": "/api/cron/reminders", "schedule": "0 8 * * *" }] }
+```
+
+Vercel envoie alors `CRON_SECRET` automatiquement.
 
 ## NEXT_PUBLIC_SUPABASE_URL
 

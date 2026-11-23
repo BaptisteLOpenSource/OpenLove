@@ -6,6 +6,6 @@ Dates spéciales and their Rappels (`CONTEXT.md`).
   and 7 days before. Feb 29 recurs as Feb 28 in non-leap years. "Today" = UTC date of the cron run.
 - Recipients (`sendReminders`): shared date -> both Partenaires; `private_to` set -> that
   Partenaire only. Reads with the service role (no user), then `notify` per recipient.
-- Trigger: Vercel cron (`web/vercel.json`, daily 08:00 UTC) calls `GET /api/cron/reminders` with
-  `Authorization: Bearer $CRON_SECRET` (`auth: "cron"`). Set the Vercel project root to `web/`.
-- Self-hosting without Vercel: call that route daily with the same header.
+- Trigger: no cron shipped. Forks add their own daily call to `GET /api/cron/reminders` with
+  `Authorization: Bearer $CRON_SECRET` (`auth: "cron"`), e.g. `crons` in `web/vercel.json`.
+  `CRON_SECRET` unset -> route always 401, Rappels off.

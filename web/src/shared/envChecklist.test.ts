@@ -42,11 +42,12 @@ test("a var added to the schema appears with no other edit", () => {
   expect(result).toHaveLength(3);
 });
 
-test("the real schema on empty env: Firebase optional, the rest missing", () => {
+test("the real schema on empty env: Firebase and cron optional, the rest missing", () => {
   const result = checkEnv(envSchema, {});
+  const optional = [...FIREBASE_KEYS, "CRON_SECRET"];
   expect(result).toHaveLength(Object.keys(envSchema.shape).length);
   for (const i of result) {
-    expect(i.status).toBe(FIREBASE_KEYS.includes(i.key) ? "optional" : "missing");
+    expect(i.status).toBe(optional.includes(i.key) ? "optional" : "missing");
   }
 });
 

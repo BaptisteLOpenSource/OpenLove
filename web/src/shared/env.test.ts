@@ -13,7 +13,7 @@ const base = {
   CRON_SECRET: "s3cret-s3cret-s3cret",
 };
 
-async function load(extra: Record<string, string>) {
+async function load(extra: Record<string, string | undefined>) {
   vi.resetModules();
   vi.unstubAllEnvs();
   for (const [k, v] of Object.entries({ ...base, ...extra })) vi.stubEnv(k, v);
@@ -36,7 +36,8 @@ test("partial Firebase set -> env() throws", async () => {
   expect(() => m.env()).toThrow();
 });
 
-test("CRON_SECRET stays required", async () => {
-  const m = await load({ CRON_SECRET: "" });
-  expect(() => m.env()).toThrow();
+test("CRON_SECRET optional, too short -> env() throws", async () => {
+  expect((await load({ CRON_SECRET: undefined })).env().CRON_SECRET).toBeUndefined();
+  const short = await load({ CRON_SECRET: "short" });
+  expect(() => short.env()).toThrow();
 });
