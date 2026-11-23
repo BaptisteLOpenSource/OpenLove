@@ -62,7 +62,7 @@ beforeEach(() => {
 });
 
 // toMessage decrypts the stub row: bypass it, the push path is what is under test
-vi.mock("./crypto", () => ({ encrypt: () => "enc", decrypt: () => SECRET }));
+vi.mock("@/shared/crypto", () => ({ encrypt: () => "enc", decrypt: () => SECRET }));
 
 test("notifies the other Partenaire with a generic payload, never the text", async () => {
   await sendMessage({ userId: "me", coupleId: "c1" }, SECRET, sb as never);

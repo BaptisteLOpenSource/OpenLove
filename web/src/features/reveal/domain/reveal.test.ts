@@ -2,8 +2,8 @@ import { expect, test } from "vitest";
 
 import { sortReveals, toReveal } from "./reveal";
 
-const me = "11111111-1111-4111-8111-111111111111";
-const other = "22222222-2222-4222-8222-222222222222";
+const me = "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11";
+const other = "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b22";
 const now = new Date("2026-12-01T10:00:00.000Z");
 const row = (over: object = {}) => ({
   id: 1,
