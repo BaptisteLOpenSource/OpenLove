@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   turbopack: { root },
   outputFileTracingRoot: root,
+  async headers() {
+    return [
+      { source: "/invite/:path*", headers: [{ key: "Referrer-Policy", value: "no-referrer" }] },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);
