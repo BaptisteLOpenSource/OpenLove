@@ -30,6 +30,7 @@ web/
     contracts/                  Zod schemas (API in/out) = source of contracts/*.json
     http/withContract.ts        auth (cookie|Bearer) + Zod in/out + error envelope
     supabase/                   ONE server client, ONE browser client
+    push/notify.ts              ONE FCM client: notify(userId, payload)
     env.ts                      ONE Zod env schema (also drives /setup checklist)
     ui/                         M3 primitives (Button, Card, TextField, Chip, Dialog...)
     i18n/                       next-intl, messages/fr.json

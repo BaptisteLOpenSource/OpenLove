@@ -14,6 +14,7 @@ test("supabase keys, public ones included, group under supabase", () => {
   expect(groupByStep(items)).toEqual([
     { id: "vercel", items: [] },
     { id: "supabase", items },
+    { id: "firebase", items: [] },
   ]);
 });
 
@@ -22,7 +23,7 @@ test("unknown key goes to other", () => {
 
   const groups = groupByStep([item]);
 
-  expect(groups).toHaveLength(3);
+  expect(groups).toHaveLength(4);
   expect(groups.at(-1)).toEqual({ id: "other", items: [item] });
 });
 

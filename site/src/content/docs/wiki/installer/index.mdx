@@ -101,6 +101,13 @@ Secret demandé par le formulaire de premier lancement `/setup`. Il empêche un 
 - 32 caractères minimum. Générez-le comme [MESSAGE_ENCRYPTION_KEY](#message_encryption_key), avec une autre valeur.
 - Gardez-le privé. Il ne sert qu'au premier lancement.
 
+## CRON_SECRET
+
+Secret qui protège la tâche quotidienne des Rappels. Vercel l'envoie dans l'en-tête `Authorization: Bearer` à `/api/cron/reminders` chaque jour à 08:00 UTC.
+
+- 16 caractères minimum. Générez-le avec `openssl rand -hex 16`.
+- Gardez-le privé.
+
 ## NEXT_PUBLIC_SUPABASE_URL
 
 Valeur : même valeur que [SUPABASE_URL](#supabase_url). Elle est exposée au navigateur.
@@ -109,12 +116,43 @@ Valeur : même valeur que [SUPABASE_URL](#supabase_url). Elle est exposée au na
 
 Valeur : même valeur que [SUPABASE_ANON_KEY](#supabase_anon_key). Elle est exposée au navigateur.
 
-## 4. Firebase (notifications, à venir)
+## 4. Firebase (notifications, facultatif)
 
-Les notifications push passent par Firebase Cloud Messaging. Cette version n'en a pas encore besoin : aucune variable Firebase n'est demandée par `/setup`.
+Les notifications push passent par Firebase Cloud Messaging. Chaque couple crée son projet Firebase.
 
-1. Ouvrez [console.firebase.google.com](https://console.firebase.google.com) et créez un projet.
-2. Gardez le projet pour les notifications. Les clés seront ajoutées à ce guide et à `/setup` avec la fonctionnalité qui les utilise.
+1. Étape facultative : sans Firebase, l'app fonctionne sans notifications push ni Rappels envoyés. Renseignez les 7 variables ou aucune.
+2. Créez un projet Firebase puis ajoutez-y une app Web et une app Android.
+3. Cloud Messaging : générez une paire de clés Web Push (clé VAPID).
+4. Project Settings > Service accounts : générez une clé privée, encodez le fichier JSON en base64.
+5. Copiez les identifiants de projet et des apps dans les variables ci-dessous.
+
+## FIREBASE_SERVICE_ACCOUNT
+
+Compte de service Firebase (Project Settings > Service accounts > Generate new private key), le fichier JSON encodé en base64 (base64 -w0 fichier.json). Secret, serveur uniquement.
+
+## FIREBASE_ANDROID_APP_ID
+
+ID de l'app Android Firebase (Project Settings > Your apps > App ID, forme 1:...:android:...). Envoyé à l'app Android pour initialiser Firebase.
+
+## NEXT_PUBLIC_FIREBASE_API_KEY
+
+Clé API Firebase : Project Settings > Your apps > app Web > apiKey. Exposée au navigateur.
+
+## NEXT_PUBLIC_FIREBASE_PROJECT_ID
+
+ID du projet Firebase : Project Settings > General > Project ID.
+
+## NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+
+Sender ID : Project Settings > Cloud Messaging (ou General) > Sender ID.
+
+## NEXT_PUBLIC_FIREBASE_APP_ID
+
+ID de l'app Web Firebase : Project Settings > Your apps > app Web > appId.
+
+## NEXT_PUBLIC_FIREBASE_VAPID_KEY
+
+Clé VAPID web : Project Settings > Cloud Messaging > Web Push certificates > Generate key pair.
 
 ## 5. Checklist de sécurité hébergée
 

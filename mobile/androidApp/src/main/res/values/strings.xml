@@ -42,6 +42,13 @@
     <string name="chat_load_older">Charger les messages précédents</string>
     <string name="chat_failed">Connexion perdue. Nouvel essai en cours.</string>
     <string name="chat_seen">Vu</string>
+    <string name="push_channel_chat">Messages</string>
+    <string name="push_chat_title">Nouveau message</string>
+    <string name="push_chat_text">Ouvrez l'app pour le lire.</string>
+    <string name="push_permission_title">Notifications</string>
+    <string name="push_permission_text">Recevez une alerte quand votre partenaire vous écrit.</string>
+    <string name="push_permission_allow">Activer</string>
+    <string name="push_permission_later">Plus tard</string>
     <plurals name="home_total_days">
         <item quantity="one">%d jour</item>
         <item quantity="many">%d jours</item>

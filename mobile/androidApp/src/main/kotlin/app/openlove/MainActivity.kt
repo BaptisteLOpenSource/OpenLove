@@ -25,6 +25,7 @@ import app.openlove.chat.ChatScreen
 import app.openlove.core.theme.OpenLoveTheme
 import app.openlove.home.HomeScreen
 import app.openlove.pairing.PairingScreen
+import app.openlove.push.AskNotifications
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
@@ -43,8 +44,19 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) { model.start() }
             OpenLoveTheme(theme, container.tokens) {
                 Surface(Modifier.fillMaxSize()) { Content(model, screen) }
+                AskNotifications(atHome = screen is Screen.Home || screen is Screen.Chat)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        container.foreground = true
+    }
+
+    override fun onStop() {
+        container.foreground = false
+        super.onStop()
     }
 }
 

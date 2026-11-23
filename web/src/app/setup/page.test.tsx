@@ -2,9 +2,10 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import { createTranslator, NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
-import { envSchema } from "@/shared/env";
+import { envSchema, FIREBASE_KEYS } from "@/shared/env";
 import fr from "@/shared/i18n/messages/fr.json";
 
+import { FIREBASE_ENV } from "../../../test/firebaseEnv";
 import SetupPage from "./page";
 
 const hasCouple = vi.fn();
@@ -29,6 +30,8 @@ const validEnv: Record<string, string> = {
   NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon",
   MESSAGE_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
   SETUP_TOKEN: "x".repeat(32),
+  ...FIREBASE_ENV,
+  CRON_SECRET: "s3cret-s3cret-s3cret",
 };
 
 beforeEach(() => vi.clearAllMocks());
@@ -48,13 +51,14 @@ test("renders with an empty environment", async () => {
 
   expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(fr.setup.title);
   expect(screen.getAllByText(fr.setup.status.missing)).toHaveLength(
-    Object.keys(envSchema.shape).length,
+    Object.keys(envSchema.shape).length - FIREBASE_KEYS.length,
   );
+  expect(screen.getAllByText(fr.setup.status.optional)).toHaveLength(FIREBASE_KEYS.length);
   expect(screen.queryByText(fr.setup.firstRun.title)).toBeNull();
   expect(hasCouple).not.toHaveBeenCalled();
 });
 
-test("renders the Vercel and Supabase step guides in order", async () => {
+test("renders the Vercel, Supabase and Firebase step guides in order", async () => {
   for (const key of Object.keys(envSchema.shape)) vi.stubEnv(key, "");
 
   const { container } = render(
@@ -70,6 +74,7 @@ test("renders the Vercel and Supabase step guides in order", async () => {
   ).toEqual([
     fr.setup.steps.vercel.title,
     fr.setup.steps.supabase.title,
+    fr.setup.steps.firebase.title,
     fr.setup.steps.other.title,
   ]);
   for (const line of fr.setup.steps.vercel.instructions) {
@@ -79,6 +84,22 @@ test("renders the Vercel and Supabase step guides in order", async () => {
   expect(within(checklist).getAllByRole("listitem")).toHaveLength(
     fr.setup.steps.supabase.checklist.length,
   );
+});
+
+test("env ok without Firebase -> optional rows, first-run form shown", async () => {
+  const noFirebase = Object.fromEntries(
+    Object.entries(validEnv).filter(([k]) => !FIREBASE_KEYS.includes(k)),
+  );
+  for (const k of FIREBASE_KEYS) vi.stubEnv(k, "");
+  for (const [k, v] of Object.entries(noFirebase)) vi.stubEnv(k, v);
+  hasCouple.mockResolvedValue(false);
+  render(
+    <NextIntlClientProvider locale="fr" messages={fr}>
+      {await SetupPage()}
+    </NextIntlClientProvider>,
+  );
+  expect(screen.getAllByText(fr.setup.status.optional)).toHaveLength(FIREBASE_KEYS.length);
+  expect(screen.getByText(fr.setup.firstRun.title)).toBeTruthy();
 });
 
 test("env ok and a Couple exists -> redirect to /", async () => {

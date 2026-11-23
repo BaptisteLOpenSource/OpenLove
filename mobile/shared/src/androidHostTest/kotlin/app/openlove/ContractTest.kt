@@ -4,6 +4,7 @@ import app.openlove.core.api.ErrorResponse
 import app.openlove.core.api.HealthResponse
 import app.openlove.core.api.HomeResponse
 import app.openlove.core.api.MessagesResponse
+import app.openlove.core.api.PushConfig
 import app.openlove.core.api.Session
 import app.openlove.core.api.ThemeResponse
 import kotlinx.serialization.KSerializer
@@ -25,6 +26,7 @@ class ContractTest {
             "health.json" to HealthResponse.serializer(),
             "home.json" to HomeResponse.serializer(),
             "messages.json" to MessagesResponse.serializer(),
+            "push.json" to PushConfig.serializer(),
             "session.json" to Session.serializer(),
             "theme.json" to ThemeResponse.serializer(),
         )

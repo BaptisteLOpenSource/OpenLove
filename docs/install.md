@@ -34,12 +34,27 @@ Checklist de sécurité du tableau de bord hébergé :
 - [ ] **Database > Settings** : Enforce SSL activé, restrictions réseau (allowlist). L'app utilise HTTPS, seul Postgres direct est concerné.
 - [ ] **Advisors > Security Advisor** : aucun WARN.
 
+## 3. Firebase (facultatif)
+
+1. Étape facultative : sans Firebase, l'app fonctionne sans notifications push ni Rappels envoyés. Renseignez les 7 variables ou aucune.
+2. Créez un projet Firebase puis ajoutez-y une app Web et une app Android.
+3. Cloud Messaging : générez une paire de clés Web Push (clé VAPID).
+4. Project Settings > Service accounts : générez une clé privée, encodez le fichier JSON en base64.
+5. Copiez les identifiants de projet et des apps dans les variables ci-dessous.
+
+Variables à renseigner dans Vercel :
+
+- `FIREBASE_SERVICE_ACCOUNT` : Compte de service Firebase (Project Settings > Service accounts > Generate new private key), le fichier JSON encodé en base64 (base64 -w0 fichier.json). Secret, serveur uniquement.
+- `FIREBASE_ANDROID_APP_ID` : ID de l'app Android Firebase (Project Settings > Your apps > App ID, forme 1:...:android:...). Envoyé à l'app Android pour initialiser Firebase.
+- `NEXT_PUBLIC_FIREBASE_API_KEY` : Clé API Firebase : Project Settings > Your apps > app Web > apiKey. Exposée au navigateur.
+- `NEXT_PUBLIC_FIREBASE_PROJECT_ID` : ID du projet Firebase : Project Settings > General > Project ID.
+- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` : Sender ID : Project Settings > Cloud Messaging (ou General) > Sender ID.
+- `NEXT_PUBLIC_FIREBASE_APP_ID` : ID de l'app Web Firebase : Project Settings > Your apps > app Web > appId.
+- `NEXT_PUBLIC_FIREBASE_VAPID_KEY` : Clé VAPID web : Project Settings > Cloud Messaging > Web Push certificates > Generate key pair.
+
 ## Autres variables
 
 - `MESSAGE_ENCRYPTION_KEY` : clé AES-256 des Messages, 32 octets en base64 (`openssl rand -base64 32`). Secrète, jamais en base. La perdre rend les Messages illisibles.
 - `SETUP_TOKEN` : secret demandé par le formulaire de premier lancement `/setup`, qui empêche un inconnu de créer le Couple. 32 caractères minimum (`openssl rand -base64 32`). Gardez-le privé.
+- `CRON_SECRET` : secret d'au moins 16 caractères qui protège la tâche quotidienne des Rappels (`openssl rand -hex 16`). Vercel l'envoie en `Authorization: Bearer` à `/api/cron/reminders` chaque jour à 08:00 UTC.
 
----
-
-Firebase (notifications) et les autres clés générées (rappels) seront ajoutés avec les
-fonctionnalités qui les utilisent.
