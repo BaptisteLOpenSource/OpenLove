@@ -73,11 +73,11 @@ describe.skipIf(!up)("POST /api/session and /api/session/refresh", () => {
     expect((await res.json()).error.code).toBe("unauthorized");
   });
 
-  test("account outside the couple -> 403, no session leaked", async () => {
+  test("account outside the couple -> 401 like a wrong password, no session leaked", async () => {
     const res = await login(SEED.emails.stranger, SEED.password);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(401);
     const body = await res.json();
-    expect(body.error.code).toBe("not_couple_member");
+    expect(body.error.code).toBe("unauthorized");
     expect(body.data).toBeUndefined();
   });
 
