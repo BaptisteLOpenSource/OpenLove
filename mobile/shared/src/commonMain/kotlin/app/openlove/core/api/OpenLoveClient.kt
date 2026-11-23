@@ -64,6 +64,14 @@ private data class PushTokenBody(
     val platform: String = "android",
 )
 
+@Serializable
+private data class CreateRevealBody(
+    val kind: RevealKind,
+    val title: String,
+    val body: String,
+    val revealAt: String,
+)
+
 class OpenLoveClient(
     private val store: SessionStore,
     private val http: HttpClient = createApiClient(),
@@ -88,6 +96,15 @@ class OpenLoveClient(
     suspend fun sendMessage(text: String): Message = authed("/api/messages", ApiJson.encodeToString(SendBody(text)))
 
     suspend fun setMood(mood: String): HomeResponse = authed("/api/mood", ApiJson.encodeToString(MoodBody(mood)))
+
+    suspend fun reveals(): RevealsResponse = authed("/api/reveals")
+
+    suspend fun createReveal(
+        kind: RevealKind,
+        title: String,
+        body: String,
+        revealAt: String,
+    ): Reveal = authed("/api/reveals", ApiJson.encodeToString(CreateRevealBody(kind, title, body, revealAt)))
 
     suspend fun markRead() {
         authed<MarkReadResponse>("/api/messages/read", "{}")

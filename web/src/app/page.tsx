@@ -30,6 +30,9 @@ export default async function HomePage() {
       <Link href="/messages" className="rounded-full border px-4 py-2">
         {t("messages")}
       </Link>
+      <Link href="/archive" className="rounded-full border px-4 py-2">
+        {t("archive")}
+      </Link>
       <form action={signOut}>
         <button type="submit" className="rounded-full border px-4 py-2">
           {t("logout")}

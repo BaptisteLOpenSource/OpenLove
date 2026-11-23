@@ -41,6 +41,8 @@ private const val HOME =
     """{"data":{"milestone":{"years":1,"months":2,"days":3,"totalDays":430},"upcomingDate":null,""" +
         """"mood":{"mine":null,"partner":null},"moodHistory":[]}}"""
 private const val MESSAGE = """{"data":{"id":"7","authorId":"u","body":"Salut","createdAt":"2026-11-18T10:00:00.000Z"}}"""
+private const val REVEAL =
+    """{"id":"7","kind":"letter","authorId":"u","revealAt":"2026-12-24T08:00:00.000Z","locked":true,"title":null,"body":null}"""
 private const val UNAUTHORIZED = """{"error":{"code":"unauthorized","message":"nope"}}"""
 
 private fun MockRequestHandleScope.reply(
@@ -212,6 +214,33 @@ class OpenLoveClientTest {
                 }
             c.sendMessage("Salut")
             assertEquals(listOf<String?>("Bearer a1", "Bearer a2"), auths)
+        }
+
+    @Test
+    fun revealsGetDecodesLockedItem() =
+        runTest {
+            val c = client(paired) { reply(HttpStatusCode.OK, """{"data":{"items":[$REVEAL],"me":"u"}}""") }
+            val r = c.reveals()
+            assertEquals(RevealKind.Letter, r.items.single().kind)
+            assertEquals(true, r.items.single().locked)
+            assertNull(r.items.single().title)
+        }
+
+    @Test
+    fun createRevealPostsBodyAndSurfacesValidationError() =
+        runTest {
+            var body = ""
+            val ok = client(paired) {
+                body = it.body.toByteArray().decodeToString()
+                reply(HttpStatusCode.OK, """{"data":$REVEAL}""")
+            }
+            ok.createReveal(RevealKind.Surprise, "T", "B", "2026-12-24T08:00:00.000Z")
+            assertEquals("""{"kind":"surprise","title":"T","body":"B","revealAt":"2026-12-24T08:00:00.000Z"}""", body)
+            val bad = client(paired) {
+                reply(HttpStatusCode.BadRequest, """{"error":{"code":"validation_failed","message":"past"}}""")
+            }
+            val e = assertFailsWith<ApiException> { bad.createReveal(RevealKind.Letter, "T", "B", "2020-01-01T00:00:00.000Z") }
+            assertEquals(400, e.status)
         }
 
     @Test

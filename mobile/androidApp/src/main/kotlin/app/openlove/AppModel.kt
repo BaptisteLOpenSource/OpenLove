@@ -7,6 +7,7 @@ import app.openlove.core.api.OpenLoveClient
 import app.openlove.core.api.ThemeResponse
 import app.openlove.core.session.PairingLink
 import app.openlove.core.theme.ThemeCache
+import app.openlove.reveals.RevealsModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,11 @@ sealed interface Screen {
     data class Chat(
         val home: Home,
         val chat: ChatModel,
+    ) : Screen
+
+    data class Reveals(
+        val home: Home,
+        val reveals: RevealsModel,
     ) : Screen
 
     data object Unreachable : Screen
@@ -81,8 +87,18 @@ class AppModel(
         }
     }
 
+    fun openReveals() {
+        (_screen.value as? Screen.Home)?.let {
+            _screen.value = Screen.Reveals(it, RevealsModel(client, onSessionLost = { _screen.value = Screen.Pairing() }))
+        }
+    }
+
     fun back() {
-        (_screen.value as? Screen.Chat)?.let { _screen.value = it.home }
+        when (val s = _screen.value) {
+            is Screen.Chat -> _screen.value = s.home
+            is Screen.Reveals -> _screen.value = s.home
+            else -> {}
+        }
     }
 
     suspend fun pair(raw: String) {

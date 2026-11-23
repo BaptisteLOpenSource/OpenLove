@@ -1,0 +1,91 @@
+{
+  "valid": [
+    {
+      "items": [
+        {
+          "id": "7",
+          "kind": "letter",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "revealAt": "2026-12-24T08:00:00.000Z",
+          "locked": false,
+          "title": "Pour toi",
+          "body": "Joyeux Noël"
+        }
+      ],
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    },
+    {
+      "items": [
+        {
+          "id": "7",
+          "kind": "letter",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "revealAt": "2026-12-24T08:00:00.000Z",
+          "locked": true,
+          "title": null,
+          "body": null
+        }
+      ],
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    },
+    {
+      "items": [],
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    }
+  ],
+  "invalid": [
+    {
+      "items": [
+        {
+          "id": "7",
+          "kind": "letter",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "revealAt": "2026-12-24T08:00:00.000Z",
+          "locked": false,
+          "title": "Pour toi",
+          "body": "Joyeux Noël"
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "id": "7",
+          "kind": "quiz",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "revealAt": "2026-12-24T08:00:00.000Z",
+          "locked": false,
+          "title": "Pour toi",
+          "body": "Joyeux Noël"
+        }
+      ],
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    },
+    {
+      "items": [
+        {
+          "id": "7",
+          "kind": "letter",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "revealAt": "2026-12-24T08:00:00.000Z",
+          "title": "Pour toi",
+          "body": "Joyeux Noël"
+        }
+      ],
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    },
+    {
+      "items": [
+        {
+          "id": "7",
+          "kind": "letter",
+          "authorId": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11",
+          "revealAt": "2026-12-24T08:00:00.000Z",
+          "locked": false,
+          "body": "Joyeux Noël"
+        }
+      ],
+      "me": "0192f6c4-5b1a-7c55-9a43-0d2f6f6a9b11"
+    }
+  ]
+}
