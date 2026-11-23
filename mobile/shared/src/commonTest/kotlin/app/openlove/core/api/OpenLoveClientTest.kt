@@ -254,4 +254,37 @@ class OpenLoveClientTest {
             assertEquals(502, e.status)
             assertEquals("unavailable", e.code)
         }
+
+    @Test
+    fun pushConfigDecodes() =
+        runTest {
+            val c =
+                client(paired) {
+                    reply(
+                        HttpStatusCode.OK,
+                        """{"data":{"projectId":"p","apiKey":"k","messagingSenderId":"1","androidAppId":"1:1:android:a"}}""",
+                    )
+                }
+            assertEquals(PushConfig("p", "k", "1", "1:1:android:a"), c.pushConfig())
+        }
+
+    @Test
+    fun registerPushTokenPostsTokenAndPlatform() =
+        runTest {
+            var body = ""
+            val c =
+                client(paired) {
+                    body = it.body.toByteArray().decodeToString()
+                    reply(HttpStatusCode.OK, """{"data":{"registered":true}}""")
+                }
+            c.registerPushToken("tok")
+            assertEquals("""{"token":"tok","platform":"android"}""", body)
+        }
+
+    @Test
+    fun registerPushTokenForbiddenThrows() =
+        runTest {
+            val c = client(paired) { reply(HttpStatusCode.Forbidden, """{"error":{"code":"forbidden","message":"no"}}""") }
+            assertEquals(403, assertFailsWith<ApiException> { c.registerPushToken("tok") }.status)
+        }
 }

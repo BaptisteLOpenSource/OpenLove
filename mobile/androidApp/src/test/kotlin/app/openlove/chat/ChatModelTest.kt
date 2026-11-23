@@ -13,8 +13,11 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -42,7 +45,7 @@ class ChatModelTest {
     private val pages = HashMap<String, String>()
     private var sent = msg("11")
 
-    private fun model(): ChatModel {
+    private fun model(wake: SharedFlow<Unit> = MutableSharedFlow()): ChatModel {
         val engine =
             MockEngine {
                 val query = it.url.encodedQuery.let { q -> if (q.isEmpty()) "" else "?$q" }
@@ -56,7 +59,7 @@ class ChatModelTest {
                     }
                 respond("""{"data":$data}""", HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, "application/json"))
             }
-        return ChatModel(OpenLoveClient(MemoryStore(), createApiClient(engine)))
+        return ChatModel(OpenLoveClient(MemoryStore(), createApiClient(engine)), wake = wake)
     }
 
     private fun ChatModel.ids() = state.value.items.map { it.id }
@@ -92,6 +95,20 @@ class ChatModelTest {
             job.cancelAndJoin()
             advanceTimeBy(10_000)
             assertTrue(requests.tryReceive().isFailure)
+        }
+
+    @Test
+    fun wakeTriggersRefreshBeforeTheNextTick() =
+        runTest {
+            pages["GET /api/messages"] = page(null, "1")
+            val wake = MutableSharedFlow<Unit>()
+            val job = launch { model(wake).poll() }
+            requests.receive()
+            runCurrent()
+            wake.emit(Unit)
+            requests.receive()
+            assertEquals(0L, testScheduler.currentTime)
+            job.cancelAndJoin()
         }
 
     @Test

@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.datastore.core)
     implementation(libs.tink.android)
     implementation(libs.play.services.code.scanner)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
     testImplementation(libs.junit)
     testImplementation(libs.ktor.client.mock)

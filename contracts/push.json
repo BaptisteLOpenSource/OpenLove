@@ -1,0 +1,17 @@
+{
+  "valid": [
+    {
+      "projectId": "openlove-demo",
+      "apiKey": "demo-api-key",
+      "messagingSenderId": "123456789012",
+      "androidAppId": "1:123456789012:android:0123456789abcdef"
+    }
+  ],
+  "invalid": [
+    {
+      "projectId": "openlove-demo",
+      "apiKey": "demo-api-key",
+      "messagingSenderId": "123456789012"
+    }
+  ]
+}

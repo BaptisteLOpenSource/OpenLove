@@ -58,6 +58,12 @@ private data class MoodBody(
     val mood: String,
 )
 
+@Serializable
+private data class PushTokenBody(
+    val token: String,
+    val platform: String = "android",
+)
+
 class OpenLoveClient(
     private val store: SessionStore,
     private val http: HttpClient = createApiClient(),
@@ -85,6 +91,12 @@ class OpenLoveClient(
 
     suspend fun markRead() {
         authed<MarkReadResponse>("/api/messages/read", "{}")
+    }
+
+    suspend fun pushConfig(): PushConfig = authed("/api/push-config")
+
+    suspend fun registerPushToken(token: String) {
+        authed<RegisterPushTokenResponse>("/api/push-tokens", ApiJson.encodeToString(PushTokenBody(token)))
     }
 
     suspend fun theme(): ThemeResponse = send(current().instanceUrl, "/api/theme")
