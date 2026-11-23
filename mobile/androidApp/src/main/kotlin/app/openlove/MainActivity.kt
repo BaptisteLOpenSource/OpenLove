@@ -25,6 +25,8 @@ import app.openlove.chat.ChatScreen
 import app.openlove.core.theme.OpenLoveTheme
 import app.openlove.home.HomeScreen
 import app.openlove.pairing.PairingScreen
+import app.openlove.push.AskNotifications
+import app.openlove.reveals.RevealsScreen
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
@@ -43,8 +45,19 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) { model.start() }
             OpenLoveTheme(theme, container.tokens) {
                 Surface(Modifier.fillMaxSize()) { Content(model, screen) }
+                AskNotifications(atHome = screen is Screen.Home || screen is Screen.Chat || screen is Screen.Reveals)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        container.foreground = true
+    }
+
+    override fun onStop() {
+        container.foreground = false
+        super.onStop()
     }
 }
 
@@ -67,6 +80,7 @@ private fun Content(
             HomeScreen(
                 screen.home,
                 onOpenChat = model::openChat,
+                onOpenReveals = model::openReveals,
                 onSetMood = { mood -> scope.launch { model.setMood(mood) } },
             )
         is Screen.Chat ->
@@ -76,6 +90,7 @@ private fun Content(
                 onBack = model::back,
                 onSetMood = { mood -> scope.launch { model.setMood(mood) } },
             )
+        is Screen.Reveals -> RevealsScreen(screen.reveals, onBack = model::back)
         Screen.Unreachable ->
             Centered {
                 Text(stringResource(R.string.error_unreachable))

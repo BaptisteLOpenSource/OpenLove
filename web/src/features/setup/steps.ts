@@ -3,6 +3,7 @@ import type { EnvCheckItem } from "@/shared/envChecklist";
 const steps = [
   { id: "vercel", prefixes: [] },
   { id: "supabase", prefixes: ["SUPABASE_", "NEXT_PUBLIC_SUPABASE_"] },
+  { id: "firebase", prefixes: ["FIREBASE_", "NEXT_PUBLIC_FIREBASE_"] },
 ] as const satisfies readonly { id: string; prefixes: readonly string[] }[];
 
 type StepId = (typeof steps)[number]["id"] | "other";

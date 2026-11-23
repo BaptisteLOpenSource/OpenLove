@@ -1,12 +1,14 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getTranslations } from "next-intl/server";
+import { after } from "next/server";
 import type { z } from "zod";
 
 import type { message, messagesQuery } from "@/shared/contracts/messages";
+import { decrypt, encrypt } from "@/shared/crypto";
 import { env } from "@/shared/env";
-import type { Partner } from "@/shared/supabase/server";
-
-import { decrypt, encrypt } from "./crypto";
+import { notify } from "@/shared/push/notify";
+import { adminClient, type Partner } from "@/shared/supabase/server";
 
 type Message = z.input<typeof message>;
 type Row = { id: number; author_id: string; body_enc: string; created_at: string };
@@ -47,7 +49,25 @@ export async function sendMessage(
     .select(COLUMNS)
     .single();
   if (error) throw error;
+  after(() => pushToPartner(partner));
   return toMessage(data);
+}
+
+// Generic text only (ADR 0004): the Message content never leaves the server. Never fails the send.
+async function pushToPartner({ userId, coupleId }: Pick<Partner, "userId" | "coupleId">) {
+  try {
+    const { data, error } = await adminClient()
+      .from("couple_members")
+      .select("user_id")
+      .eq("couple_id", coupleId)
+      .neq("user_id", userId);
+    if (error) throw error;
+    const t = await getTranslations("messages.push");
+    const payload = { title: t("title"), body: t("body"), url: "/messages", tag: "chat" };
+    await Promise.all(data.map((m) => notify(m.user_id, payload)));
+  } catch (err) {
+    console.error("message push failed", err instanceof Error ? err.message : err);
+  }
 }
 
 export async function listMessages(

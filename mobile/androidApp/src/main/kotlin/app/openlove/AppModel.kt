@@ -7,6 +7,9 @@ import app.openlove.core.api.OpenLoveClient
 import app.openlove.core.api.ThemeResponse
 import app.openlove.core.session.PairingLink
 import app.openlove.core.theme.ThemeCache
+import app.openlove.reveals.RevealsModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
@@ -27,6 +30,11 @@ sealed interface Screen {
         val chat: ChatModel,
     ) : Screen
 
+    data class Reveals(
+        val home: Home,
+        val reveals: RevealsModel,
+    ) : Screen
+
     data object Unreachable : Screen
 }
 
@@ -35,6 +43,8 @@ enum class PairingError { CodeExpired, BadCredentials, NotMember, RateLimited, I
 class AppModel(
     private val client: OpenLoveClient,
     private val themeCache: ThemeCache,
+    private val chatWake: ReceiveChannel<Unit> = Channel(Channel.CONFLATED),
+    private val onHome: suspend () -> Unit = {},
 ) {
     private val _screen = MutableStateFlow<Screen>(Screen.Loading)
     val screen: StateFlow<Screen> = _screen
@@ -62,7 +72,7 @@ class AppModel(
     private suspend fun showHome(load: suspend () -> HomeResponse = { client.home() }) {
         _screen.value =
             try {
-                loadHome(load)
+                loadHome(load).also { onHome() }
             } catch (e: ApiException) {
                 if (e.status == 401) Screen.Pairing() else Screen.Unreachable
             } catch (e: IOException) {
@@ -72,12 +82,23 @@ class AppModel(
 
     fun openChat() {
         (_screen.value as? Screen.Home)?.let {
-            _screen.value = Screen.Chat(it, ChatModel(client, onSessionLost = { _screen.value = Screen.Pairing() }))
+            val chat = ChatModel(client, onSessionLost = { _screen.value = Screen.Pairing() }, wake = chatWake)
+            _screen.value = Screen.Chat(it, chat)
+        }
+    }
+
+    fun openReveals() {
+        (_screen.value as? Screen.Home)?.let {
+            _screen.value = Screen.Reveals(it, RevealsModel(client, onSessionLost = { _screen.value = Screen.Pairing() }))
         }
     }
 
     fun back() {
-        (_screen.value as? Screen.Chat)?.let { _screen.value = it.home }
+        when (val s = _screen.value) {
+            is Screen.Chat -> _screen.value = s.home
+            is Screen.Reveals -> _screen.value = s.home
+            else -> {}
+        }
     }
 
     suspend fun pair(raw: String) {

@@ -5,13 +5,14 @@ import { roleOf } from "@/shared/supabase/role";
 import { proxyClient } from "@/shared/supabase/server";
 
 const PUBLIC_PAGES = ["/login", "/setup"];
-// Must equal every route declared auth: "public" (drift pinned in proxy.test.ts).
+// Must equal every route declared auth: "public" or "cron" (cron: withContract checks CRON_SECRET; drift pinned in proxy.test.ts).
 export const PUBLIC_API = [
   "/api/health",
   "/api/session",
   "/api/session/refresh",
   "/api/pairing",
   "/api/theme",
+  "/api/cron/reminders",
 ];
 // Invite token is the credential: only this prefix is opened.
 const INVITE_PREFIX = "/invite/";

@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { NextRequest, type NextResponse } from "next/server";
 import { beforeEach, expect, test, vi } from "vitest";
 
+import { FIREBASE_ENV } from "../test/firebaseEnv";
 import { PUBLIC_API, proxy } from "./proxy";
 
 type SetAll = (
@@ -42,6 +43,8 @@ beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "a");
   vi.stubEnv("SETUP_TOKEN", "x".repeat(32));
+  for (const [k, v] of Object.entries(FIREBASE_ENV)) vi.stubEnv(k, v);
+  vi.stubEnv("CRON_SECRET", "s3cret-s3cret-s3cret");
 });
 
 const at = (path: string, headers?: Record<string, string>) =>
@@ -135,12 +138,12 @@ test.each(PUBLIC_API)("public API %s passes with no token, no claim check", asyn
   expect(claimsCalls).toEqual([]);
 });
 
-test('every auth:"public" route is in the proxy public list', () => {
+test('every auth:"public" or auth:"cron" route is in the proxy public list', () => {
   const root = join(process.cwd(), "src/app/api");
   const publicRoutes = (readdirSync(root, { recursive: true }) as string[])
     .filter((f) => f.endsWith("route.ts"))
-    .filter((f) => readFileSync(join(root, f), "utf8").includes('auth: "public"'))
-    .map((f) => `/api/${dirname(f).replaceAll("\\", "/")}`.replace(/\/\.$/, ""));
+    .filter((f) => /auth: "(public|cron)"/.test(readFileSync(join(root, f), "utf8")))
+    .map((f) => `/api/${dirname(f)}`.replaceAll("\\", "/").replace(/\/\.$/, ""));
   expect(publicRoutes.length).toBeGreaterThan(0);
   for (const path of publicRoutes) expect(PUBLIC_API).toContain(path);
 });

@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { z } from "zod";
 
-import { envSchema } from "./env";
+import { envSchema, FIREBASE_KEYS } from "./env";
 import { checkEnv } from "./envChecklist";
 
 const schema = z.object({ URL: z.url(), TOKEN: z.string().min(1) });
@@ -21,9 +21,9 @@ test("undefined and empty string are missing", () => {
   });
 });
 
-test("an absent optional var is ok", () => {
+test("an absent optional var is optional", () => {
   const result = checkEnv(z.object({ OPT: z.string().optional() }), {});
-  expect(result).toEqual([{ key: "OPT", status: "ok" }]);
+  expect(result).toEqual([{ key: "OPT", status: "optional" }]);
 });
 
 test("present but failing the schema is invalid", () => {
@@ -42,10 +42,19 @@ test("a var added to the schema appears with no other edit", () => {
   expect(result).toHaveLength(3);
 });
 
-test("the real schema yields one missing item per key on empty env", () => {
+test("the real schema on empty env: Firebase optional, the rest missing", () => {
   const result = checkEnv(envSchema, {});
   expect(result).toHaveLength(Object.keys(envSchema.shape).length);
-  expect(result.every((i) => i.status === "missing")).toBe(true);
+  for (const i of result) {
+    expect(i.status).toBe(FIREBASE_KEYS.includes(i.key) ? "optional" : "missing");
+  }
+});
+
+test("partial all-or-nothing group: unset members are missing", () => {
+  const result = checkEnv(envSchema, { NEXT_PUBLIC_FIREBASE_API_KEY: "k" }, FIREBASE_KEYS);
+  const status = (k: string) => result.find((i) => i.key === k)?.status;
+  expect(status("NEXT_PUBLIC_FIREBASE_API_KEY")).toBe("ok");
+  expect(status("FIREBASE_ANDROID_APP_ID")).toBe("missing");
 });
 
 test("docUrl comes from the schema meta", () => {

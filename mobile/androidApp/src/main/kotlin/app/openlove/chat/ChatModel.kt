@@ -4,11 +4,13 @@ import app.openlove.core.api.ApiException
 import app.openlove.core.api.Message
 import app.openlove.core.api.MessagesResponse
 import app.openlove.core.api.OpenLoveClient
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.IOException
 
 data class ChatState(
@@ -35,6 +37,7 @@ fun seenId(
 class ChatModel(
     private val client: OpenLoveClient,
     private val onSessionLost: () -> Unit = {},
+    private val wake: ReceiveChannel<Unit> = Channel(Channel.CONFLATED),
 ) {
     private val _state = MutableStateFlow(ChatState())
     val state: StateFlow<ChatState> = _state
@@ -47,7 +50,8 @@ class ChatModel(
     suspend fun poll() {
         while (true) {
             refresh()
-            delay(POLL_MS)
+            // a push wakes the poll early; the timeout keeps the 3 s cadence
+            withTimeoutOrNull(POLL_MS) { wake.receive() }
         }
     }
 

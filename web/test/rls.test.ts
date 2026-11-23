@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { beforeAll, describe, expect, test } from "vitest";
 
 import { ensureUser, localAdmin, SEED, seed } from "../scripts/seed";
-import { encrypt } from "../src/features/messages/server/crypto";
+import { encrypt } from "../src/shared/crypto";
 
 const url = process.env.SUPABASE_URL ?? "";
 const anonKey = process.env.SUPABASE_ANON_KEY ?? "";

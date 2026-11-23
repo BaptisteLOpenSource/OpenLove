@@ -5,6 +5,8 @@ import { createInvite } from "@/features/couple/server/invite";
 import { showPairing } from "@/features/couple/server/showPairing";
 import { InvitePanel } from "@/features/couple/ui/InvitePanel";
 import { PairingPanel } from "@/features/couple/ui/PairingPanel";
+import { PushToggle } from "@/features/notifications/ui/PushToggle";
+import { firebaseConfigured } from "@/shared/env";
 import { partnerOf, serverClient } from "@/shared/supabase/server";
 
 export default async function SettingsPage() {
@@ -20,6 +22,7 @@ export default async function SettingsPage() {
   return (
     <main className="flex min-h-dvh flex-col items-center gap-6 p-6">
       <h1 className="text-headline-large">{t("title")}</h1>
+      {firebaseConfigured() && <PushToggle />}
       <PairingPanel action={showPairing} />
       {canInvite && <InvitePanel action={createInvite} />}
     </main>

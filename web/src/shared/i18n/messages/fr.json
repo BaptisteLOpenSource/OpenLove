@@ -8,6 +8,7 @@
     "intro": "Variables d'environnement requises par cette instance. Les valeurs ne sont jamais affichées.",
     "status": {
       "ok": "OK",
+      "optional": "Facultative",
       "missing": "Manquante",
       "invalid": "Invalide"
     },
@@ -20,7 +21,15 @@
       "NEXT_PUBLIC_SUPABASE_URL": "Même valeur que SUPABASE_URL, exposée au navigateur.",
       "NEXT_PUBLIC_SUPABASE_ANON_KEY": "Même valeur que SUPABASE_ANON_KEY, exposée au navigateur.",
       "MESSAGE_ENCRYPTION_KEY": "Clé AES-256 du chat: 32 octets en base64 (openssl rand -base64 32). Secrète, jamais en base. La perdre rend les Messages illisibles.",
-      "SETUP_TOKEN": "Secret demandé par le formulaire de premier lancement : empêche un inconnu de créer le Couple. 32 caractères minimum (openssl rand -base64 32). Gardez-le privé."
+      "SETUP_TOKEN": "Secret demandé par le formulaire de premier lancement : empêche un inconnu de créer le Couple. 32 caractères minimum (openssl rand -base64 32). Gardez-le privé.",
+      "FIREBASE_SERVICE_ACCOUNT": "Compte de service Firebase (Project Settings > Service accounts > Generate new private key), le fichier JSON encodé en base64 (base64 -w0 fichier.json). Secret, serveur uniquement.",
+      "FIREBASE_ANDROID_APP_ID": "ID de l'app Android Firebase (Project Settings > Your apps > App ID, forme 1:...:android:...). Envoyé à l'app Android pour initialiser Firebase.",
+      "NEXT_PUBLIC_FIREBASE_API_KEY": "Clé API Firebase : Project Settings > Your apps > app Web > apiKey. Exposée au navigateur.",
+      "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "ID du projet Firebase : Project Settings > General > Project ID.",
+      "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "Sender ID : Project Settings > Cloud Messaging (ou General) > Sender ID.",
+      "NEXT_PUBLIC_FIREBASE_APP_ID": "ID de l'app Web Firebase : Project Settings > Your apps > app Web > appId.",
+      "NEXT_PUBLIC_FIREBASE_VAPID_KEY": "Clé VAPID web : Project Settings > Cloud Messaging > Web Push certificates > Generate key pair.",
+      "CRON_SECRET": "Secret d'au moins 16 caractères qui protège la tâche quotidienne des Rappels. Générez-le avec : openssl rand -hex 16"
     },
     "fullGuide": "Guide complet d'installation (inclut la checklist de sécurité du tableau de bord hébergé)",
     "steps": {
@@ -29,6 +38,16 @@
       },
       "supabase": {
         "title": "2. Supabase"
+      },
+      "firebase": {
+        "title": "3. Firebase (facultatif)",
+        "instructions": [
+          "Étape facultative : sans Firebase, l'app fonctionne sans notifications push ni Rappels envoyés. Renseignez les 7 variables ou aucune.",
+          "Créez un projet Firebase puis ajoutez-y une app Web et une app Android.",
+          "Cloud Messaging : générez une paire de clés Web Push (clé VAPID).",
+          "Project Settings > Service accounts : générez une clé privée, encodez le fichier JSON en base64.",
+          "Copiez les identifiants de projet et des apps dans les variables ci-dessous."
+        ]
       },
       "other": {
         "title": "Autres variables"
@@ -59,6 +78,17 @@
   },
   "settings": {
     "title": "Réglages",
+    "push": {
+      "title": "Notifications",
+      "intro": "Recevez une alerte quand votre Partenaire vous écrit. Le contenu des Messages n'est jamais envoyé.",
+      "enable": "Activer les notifications",
+      "result": {
+        "enabled": "Notifications activées sur cet appareil.",
+        "denied": "Autorisation refusée : modifiez les réglages du navigateur.",
+        "unsupported": "Ce navigateur ne gère pas les notifications.",
+        "error": "Activation impossible, réessayez plus tard."
+      }
+    },
     "pairing": {
       "title": "Appairer l'app Android",
       "intro": "Scannez ce QR code depuis l'app. Il expire après 5 minutes et ne sert qu'une fois.",
@@ -88,6 +118,7 @@
     "logout": "Se déconnecter",
     "settings": "Réglages",
     "messages": "Messages",
+    "archive": "Archive",
     "milestone": {
       "title": "Ensemble depuis",
       "totalDays": "{count, plural, =0 {0 jour} one {# jour} other {# jours}}",
@@ -121,6 +152,10 @@
   },
   "messages": {
     "title": "Messages",
+    "push": {
+      "title": "Nouveau message",
+      "body": "Votre Partenaire vous a écrit."
+    },
     "empty": "Aucun message pour l'instant.",
     "placeholder": "Écrire un message",
     "send": "Envoyer",
@@ -128,5 +163,32 @@
     "seen": "Vu",
     "typing": "En train d'écrire...",
     "sendFailed": "Envoi impossible, réessayez."
+  },
+  "reminder": {
+    "title": "Rappel",
+    "today": "{label}, c'est aujourd'hui !",
+    "inDays": "{label}, dans {days} jours."
+  },
+  "reveal": {
+    "title": "Archive",
+    "empty": "Rien pour l'instant.",
+    "kind": { "surprise": "Surprise", "letter": "Lettre" },
+    "locked": {
+      "surprise": "Une surprise arrive le {date}",
+      "letter": "Une lettre arrive le {date}"
+    },
+    "scheduled": "programmée pour {date}",
+    "form": {
+      "kind": "Type",
+      "title": "Titre",
+      "body": "Message",
+      "revealAt": "Date et heure de révélation",
+      "submit": "Programmer",
+      "sent": "Programmé.",
+      "error": {
+        "invalid": "Date passée ou champs invalides.",
+        "failed": "Envoi impossible, réessayez."
+      }
+    }
   }
 }
