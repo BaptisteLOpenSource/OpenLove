@@ -140,7 +140,7 @@ test('every auth:"public" route is in the proxy public list', () => {
   const publicRoutes = (readdirSync(root, { recursive: true }) as string[])
     .filter((f) => f.endsWith("route.ts"))
     .filter((f) => readFileSync(join(root, f), "utf8").includes('auth: "public"'))
-    .map((f) => `/api/${dirname(f)}`.replace(/\/\.$/, ""));
+    .map((f) => `/api/${dirname(f).replaceAll("\\", "/")}`.replace(/\/\.$/, ""));
   expect(publicRoutes.length).toBeGreaterThan(0);
   for (const path of publicRoutes) expect(PUBLIC_API).toContain(path);
 });

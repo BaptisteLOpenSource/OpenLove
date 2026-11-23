@@ -50,9 +50,7 @@ test("renders with an empty environment", async () => {
     </NextIntlClientProvider>,
   );
 
-  expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(
-    fr.setup.title,
-  );
+  expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(fr.setup.title);
   expect(screen.getAllByText(fr.setup.status.missing)).toHaveLength(
     Object.keys(envSchema.shape).length,
   );
@@ -79,9 +77,7 @@ test("renders the step titles in order and the full wiki guide link", async () =
     fr.setup.steps.other.title,
   ]);
   expect(
-    within(container)
-      .getByRole("link", { name: fr.setup.fullGuide })
-      .getAttribute("href"),
+    within(container).getByRole("link", { name: fr.setup.fullGuide }).getAttribute("href"),
   ).toBe(INSTALL_GUIDE_URL);
 });
 
@@ -92,8 +88,7 @@ test("env ok and a Couple exists -> redirect to /", async () => {
 });
 
 test("env ok except SETUP_TOKEN -> row missing, no first-run form", async () => {
-  for (const [k, v] of Object.entries({ ...validEnv, SETUP_TOKEN: "" }))
-    vi.stubEnv(k, v);
+  for (const [k, v] of Object.entries({ ...validEnv, SETUP_TOKEN: "" })) vi.stubEnv(k, v);
   hasCouple.mockResolvedValue(false);
   render(
     <NextIntlClientProvider locale="fr" messages={fr}>
@@ -113,10 +108,6 @@ test("env ok and no Couple -> checklist and first-run form", async () => {
       {await SetupPage()}
     </NextIntlClientProvider>,
   );
-  expect(
-    screen.getByRole("heading", { name: fr.setup.firstRun.title }),
-  ).toBeTruthy();
-  expect(screen.getAllByText(fr.setup.status.ok)).toHaveLength(
-    Object.keys(envSchema.shape).length,
-  );
+  expect(screen.getByRole("heading", { name: fr.setup.firstRun.title })).toBeTruthy();
+  expect(screen.getAllByText(fr.setup.status.ok)).toHaveLength(Object.keys(envSchema.shape).length);
 });
