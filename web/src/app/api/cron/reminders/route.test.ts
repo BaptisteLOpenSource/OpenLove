@@ -1,5 +1,6 @@
 import { expect, test, vi } from "vitest";
 
+import { FIREBASE_ENV } from "../../../../../test/firebaseEnv";
 import { GET } from "./route";
 
 vi.mock("@/features/calendar/server/sendReminders", () => ({ sendReminders: async () => 2 }));
@@ -14,6 +15,7 @@ test("cron GET with the secret -> { sent }, without -> 401", async () => {
   vi.stubEnv("MESSAGE_ENCRYPTION_KEY", Buffer.alloc(32, 1).toString("base64"));
   vi.stubEnv("SETUP_TOKEN", "x".repeat(32));
   vi.stubEnv("CRON_SECRET", "s3cret-s3cret-s3cret");
+  for (const [k, v] of Object.entries(FIREBASE_ENV)) vi.stubEnv(k, v);
   const call = (h?: string) =>
     GET(new Request("http://x/api/cron/reminders", { headers: h ? { Authorization: h } : {} }));
 
