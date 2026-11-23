@@ -5,6 +5,7 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { envSchema } from "@/shared/env";
 import fr from "@/shared/i18n/messages/fr.json";
 
+import { FIREBASE_ENV } from "../../../test/firebaseEnv";
 import SetupPage from "./page";
 
 const hasCouple = vi.fn();
@@ -29,6 +30,7 @@ const validEnv: Record<string, string> = {
   NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon",
   MESSAGE_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
   SETUP_TOKEN: "x".repeat(32),
+  ...FIREBASE_ENV,
 };
 
 beforeEach(() => vi.clearAllMocks());
@@ -54,7 +56,7 @@ test("renders with an empty environment", async () => {
   expect(hasCouple).not.toHaveBeenCalled();
 });
 
-test("renders the Vercel and Supabase step guides in order", async () => {
+test("renders the Vercel, Supabase and Firebase step guides in order", async () => {
   for (const key of Object.keys(envSchema.shape)) vi.stubEnv(key, "");
 
   const { container } = render(
@@ -70,6 +72,7 @@ test("renders the Vercel and Supabase step guides in order", async () => {
   ).toEqual([
     fr.setup.steps.vercel.title,
     fr.setup.steps.supabase.title,
+    fr.setup.steps.firebase.title,
     fr.setup.steps.other.title,
   ]);
   for (const line of fr.setup.steps.vercel.instructions) {

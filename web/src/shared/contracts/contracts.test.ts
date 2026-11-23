@@ -10,7 +10,9 @@ test("each contract example validates or fails as labeled", async () => {
   for (const file of readdirSync(dir).filter((f) => /^(?!.*\.test\.).*\.ts$/.test(f))) {
     // oxlint-disable-next-line no-unsanitized/method -- path comes from readdirSync of our own dir
     const mod = await import(`./${file}`);
-    const schema = Object.entries(mod).find(([k]) => k.endsWith("Response"))?.[1] as {
+    const schema = Object.entries(mod).find(
+      ([k]) => k.endsWith("Response") || k === "pushConfig",
+    )?.[1] as {
       safeParse: (v: unknown) => { success: boolean };
     };
     for (const v of mod.examples.valid) expect(schema.safeParse(v).success).toBe(true);

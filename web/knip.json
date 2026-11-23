@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignore": ["test/arch-fixtures/**"],
+  "ignore": ["test/arch-fixtures/**", "public/**"],
   "entry": [
     "src/shared/i18n/request.ts",
     "src/shared/contracts/*.ts",

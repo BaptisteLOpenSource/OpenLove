@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { partnerOf, serverClient } from "@/shared/supabase/server";
 
+import { FIREBASE_ENV } from "../../../test/firebaseEnv";
 import { ApiError, withContract } from "./withContract";
 
 const sb = { tag: "sb" };
@@ -21,6 +22,7 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "b");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "a");
+  for (const [k, v] of Object.entries(FIREBASE_ENV)) vi.stubEnv(k, v);
 });
 
 test("invalid body -> 400 validation_failed", async () => {

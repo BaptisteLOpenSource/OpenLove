@@ -1,5 +1,6 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
+import { FIREBASE_ENV } from "../../../test/firebaseEnv";
 import { partnerOf, serverClient } from "./server";
 
 const getUser = vi.fn();
@@ -27,6 +28,7 @@ beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "a");
   vi.stubEnv("SETUP_TOKEN", "x".repeat(32));
+  for (const [k, v] of Object.entries(FIREBASE_ENV)) vi.stubEnv(k, v);
 });
 
 test("member -> partner with couple and role", async () => {
