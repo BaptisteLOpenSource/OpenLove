@@ -1,9 +1,13 @@
 import { getTranslations } from "next-intl/server";
+import { z } from "zod";
 
 import { notify } from "@/shared/push/notify";
 import { adminClient } from "@/shared/supabase/server";
 
 import { dueReminders, type SpecialDate } from "../domain/reminders";
+
+// Here, not shared/contracts: cron is no Android contract, so no fixture.
+export const remindersResponse = z.object({ sent: z.int().nonnegative() });
 
 type Row = SpecialDate & { couple_id: string };
 

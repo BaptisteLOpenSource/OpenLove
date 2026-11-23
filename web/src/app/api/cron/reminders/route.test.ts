@@ -3,7 +3,10 @@ import { expect, test, vi } from "vitest";
 import { FIREBASE_ENV } from "../../../../../test/firebaseEnv";
 import { GET } from "./route";
 
-vi.mock("@/features/calendar/server/sendReminders", () => ({ sendReminders: async () => 2 }));
+vi.mock("@/features/calendar/server/sendReminders", async () => {
+  const { z } = await import("zod");
+  return { remindersResponse: z.object({ sent: z.int() }), sendReminders: async () => 2 };
+});
 vi.mock("@/shared/supabase/server", () => ({ serverClient: vi.fn(), partnerOf: vi.fn() }));
 
 test("cron GET with the secret -> { sent }, without -> 401", async () => {
