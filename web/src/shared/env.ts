@@ -33,6 +33,10 @@ export const envSchema = z.object({
     .string()
     .min(32)
     .meta({ docUrl: guide("setup_token") }),
+  CRON_SECRET: z
+    .string()
+    .min(16)
+    .meta({ docUrl: guide("cron_secret") }),
 });
 
 export const publicEnvSchema = envSchema.pick({

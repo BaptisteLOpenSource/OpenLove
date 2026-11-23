@@ -27,6 +27,7 @@ beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "a");
   vi.stubEnv("SETUP_TOKEN", "x".repeat(32));
+  vi.stubEnv("CRON_SECRET", "s3cret-s3cret-s3cret");
 });
 
 test("member -> partner with couple and role", async () => {

@@ -1,12 +1,15 @@
+import { createHash, timingSafeEqual } from "node:crypto";
+
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import type { ErrorCode } from "@/shared/contracts/error";
+import { env } from "@/shared/env";
 import { partnerOf, type Partner, serverClient } from "@/shared/supabase/server";
 
 import { bearerToken, fail } from "./envelope";
 
-type Auth = "partner" | "public";
+type Auth = "partner" | "cron" | "public";
 type Ctx<A extends Auth> = { req: Request } & (A extends "partner"
   ? { partner: Partner; sb: SupabaseClient }
   : object);
@@ -29,12 +32,18 @@ function sameOrigin(req: Request) {
   return !!origin && !!host && URL.parse(origin)?.host === host;
 }
 
+const digest = (v: string) => createHash("sha256").update(v).digest();
+
 async function authorize(
   req: Request,
   mode: Auth,
 ): Promise<Response | { partner?: Partner; sb?: SupabaseClient }> {
   if (mode === "public") return {};
   const token = bearerToken(req);
+  if (mode === "cron") {
+    const ok = token && timingSafeEqual(digest(token), digest(env().CRON_SECRET));
+    return ok ? {} : fail(401, "unauthorized", "unauthorized");
+  }
   const mutation = req.method !== "GET" && req.method !== "HEAD";
   if (!token && mutation && !sameOrigin(req)) return fail(403, "forbidden", "origin mismatch");
   const sb = await serverClient(token);

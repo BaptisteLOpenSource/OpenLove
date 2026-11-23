@@ -29,6 +29,7 @@ const validEnv: Record<string, string> = {
   NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon",
   MESSAGE_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
   SETUP_TOKEN: "x".repeat(32),
+  CRON_SECRET: "s3cret-s3cret-s3cret",
 };
 
 beforeEach(() => vi.clearAllMocks());

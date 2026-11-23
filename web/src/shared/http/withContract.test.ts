@@ -21,6 +21,9 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "b");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "a");
+  vi.stubEnv("MESSAGE_ENCRYPTION_KEY", Buffer.alloc(32, 1).toString("base64"));
+  vi.stubEnv("SETUP_TOKEN", "x".repeat(32));
+  vi.stubEnv("CRON_SECRET", "s3cret-s3cret-s3cret");
 });
 
 test("invalid body -> 400 validation_failed", async () => {
@@ -182,4 +185,17 @@ test("handler ctx carries the request for public routes", async () => {
   });
   await route(new Request("http://x/api/t?a=1"));
   expect(seen).toEqual(["http://x/api/t?a=1"]);
+});
+
+test("cron: wrong or missing secret -> 401, right secret -> 200 without partner", async () => {
+  const route = withContract({ output: z.object({}), auth: "cron" }, (_i, ctx) => {
+    expect("partner" in ctx).toBe(false);
+    return {};
+  });
+  const call = (h?: string) =>
+    route(new Request("http://x/api/t", { headers: h ? { Authorization: h } : {} }));
+  expect((await call()).status).toBe(401);
+  expect((await call("Bearer short")).status).toBe(401);
+  expect((await call("Bearer s3cret-s3cret-s3cret")).status).toBe(200);
+  expect(serverClient).not.toHaveBeenCalled();
 });

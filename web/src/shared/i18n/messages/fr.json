@@ -20,7 +20,8 @@
       "NEXT_PUBLIC_SUPABASE_URL": "Même valeur que SUPABASE_URL, exposée au navigateur.",
       "NEXT_PUBLIC_SUPABASE_ANON_KEY": "Même valeur que SUPABASE_ANON_KEY, exposée au navigateur.",
       "MESSAGE_ENCRYPTION_KEY": "Clé AES-256 du chat: 32 octets en base64 (openssl rand -base64 32). Secrète, jamais en base. La perdre rend les Messages illisibles.",
-      "SETUP_TOKEN": "Secret demandé par le formulaire de premier lancement : empêche un inconnu de créer le Couple. 32 caractères minimum (openssl rand -base64 32). Gardez-le privé."
+      "SETUP_TOKEN": "Secret demandé par le formulaire de premier lancement : empêche un inconnu de créer le Couple. 32 caractères minimum (openssl rand -base64 32). Gardez-le privé.",
+      "CRON_SECRET": "Secret d'au moins 16 caractères qui protège la tâche quotidienne des Rappels. Générez-le avec : openssl rand -hex 16"
     },
     "checklistTitle": "Checklist de sécurité du tableau de bord hébergé",
     "steps": {
@@ -131,5 +132,10 @@
     "seen": "Vu",
     "typing": "En train d'écrire...",
     "sendFailed": "Envoi impossible, réessayez."
+  },
+  "reminder": {
+    "title": "Rappel",
+    "today": "{label}, c'est aujourd'hui !",
+    "inDays": "{label}, dans {days} jours."
   }
 }
