@@ -8,7 +8,8 @@ declare module "zod" {
 
 // Wiki and presentation page: GitHub Pages on the author's domain (site/).
 const WIKI_URL = "https://openlove.baptisteledev.fr/wiki";
-const guide = (anchor: string) => `${WIKI_URL}/installer/#${anchor}`;
+export const INSTALL_GUIDE_URL = `${WIKI_URL}/installer/`;
+const guide = (anchor: string) => `${INSTALL_GUIDE_URL}#${anchor}`;
 
 export const envSchema = z.object({
   SUPABASE_URL: z.url().meta({ docUrl: guide("supabase_url") }),

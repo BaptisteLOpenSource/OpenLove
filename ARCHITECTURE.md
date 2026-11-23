@@ -103,5 +103,5 @@ Business rule needing a DB to test = rule leaked out of `domain/`.
 ## 7. Docs
 
 Root `README.md` (users), this file (contributors), `CONTEXT.md` (language), `docs/decisions/`
-(why), `docs/install.md` + in-app `/setup` (deploy), `web/src/features/*/README.md` once a feature
+(why), wiki installer guide + in-app `/setup` (deploy), `web/src/features/*/README.md` once a feature
 has invariants worth stating.
