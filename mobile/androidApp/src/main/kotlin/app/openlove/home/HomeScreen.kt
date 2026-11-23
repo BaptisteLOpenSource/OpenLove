@@ -22,10 +22,12 @@ import java.util.Locale
 fun HomeScreen(
     home: HomeResponse,
     onOpenChat: () -> Unit,
+    onOpenReveals: () -> Unit,
     onSetMood: (String) -> Unit,
 ) {
     Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Button(onClick = onOpenChat) { Text(stringResource(R.string.home_open_chat)) }
+        Button(onClick = onOpenReveals) { Text(stringResource(R.string.home_open_reveals)) }
         Text(stringResource(R.string.mood_title), style = MaterialTheme.typography.titleMedium)
         Text(stringResource(R.string.mood_mine, moodLabel(home.mood.mine)))
         Text(stringResource(R.string.mood_partner, moodLabel(home.mood.partner)))
