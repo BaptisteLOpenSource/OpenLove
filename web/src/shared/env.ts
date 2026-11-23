@@ -56,6 +56,10 @@ export const envSchema = z.object({
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: firebaseKey("next_public_firebase_messaging_sender_id"),
   NEXT_PUBLIC_FIREBASE_APP_ID: firebaseKey("next_public_firebase_app_id"),
   NEXT_PUBLIC_FIREBASE_VAPID_KEY: firebaseKey("next_public_firebase_vapid_key"),
+  CRON_SECRET: z
+    .string()
+    .min(16)
+    .meta({ docUrl: guide("cron_secret") }),
 });
 
 export const publicEnvSchema = envSchema.pick({

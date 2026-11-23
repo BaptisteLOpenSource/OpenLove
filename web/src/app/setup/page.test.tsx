@@ -31,6 +31,7 @@ const validEnv: Record<string, string> = {
   MESSAGE_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
   SETUP_TOKEN: "x".repeat(32),
   ...FIREBASE_ENV,
+  CRON_SECRET: "s3cret-s3cret-s3cret",
 };
 
 beforeEach(() => vi.clearAllMocks());

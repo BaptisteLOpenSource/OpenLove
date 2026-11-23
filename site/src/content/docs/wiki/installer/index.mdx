@@ -101,6 +101,13 @@ Secret demandé par le formulaire de premier lancement `/setup`. Il empêche un 
 - 32 caractères minimum. Générez-le comme [MESSAGE_ENCRYPTION_KEY](#message_encryption_key), avec une autre valeur.
 - Gardez-le privé. Il ne sert qu'au premier lancement.
 
+## CRON_SECRET
+
+Secret qui protège la tâche quotidienne des Rappels. Vercel l'envoie dans l'en-tête `Authorization: Bearer` à `/api/cron/reminders` chaque jour à 08:00 UTC.
+
+- 16 caractères minimum. Générez-le avec `openssl rand -hex 16`.
+- Gardez-le privé.
+
 ## NEXT_PUBLIC_SUPABASE_URL
 
 Valeur : même valeur que [SUPABASE_URL](#supabase_url). Elle est exposée au navigateur.

@@ -55,3 +55,5 @@ Variables à renseigner dans Vercel :
 
 - `MESSAGE_ENCRYPTION_KEY` : clé AES-256 des Messages, 32 octets en base64 (`openssl rand -base64 32`). Secrète, jamais en base. La perdre rend les Messages illisibles.
 - `SETUP_TOKEN` : secret demandé par le formulaire de premier lancement `/setup`, qui empêche un inconnu de créer le Couple. 32 caractères minimum (`openssl rand -base64 32`). Gardez-le privé.
+- `CRON_SECRET` : secret d'au moins 16 caractères qui protège la tâche quotidienne des Rappels (`openssl rand -hex 16`). Vercel l'envoie en `Authorization: Bearer` à `/api/cron/reminders` chaque jour à 08:00 UTC.
+

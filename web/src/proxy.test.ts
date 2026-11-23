@@ -44,6 +44,7 @@ beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "a");
   vi.stubEnv("SETUP_TOKEN", "x".repeat(32));
   for (const [k, v] of Object.entries(FIREBASE_ENV)) vi.stubEnv(k, v);
+  vi.stubEnv("CRON_SECRET", "s3cret-s3cret-s3cret");
 });
 
 const at = (path: string, headers?: Record<string, string>) =>
