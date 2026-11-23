@@ -7,6 +7,10 @@ import fr from "@/shared/i18n/messages/fr.json";
 import { sendMessage } from "./messages";
 
 vi.mock("server-only", () => ({}));
+const afterTasks: Promise<unknown>[] = [];
+vi.mock("next/server", () => ({
+  after: (cb: () => unknown) => afterTasks.push(Promise.resolve(cb())),
+}));
 vi.mock("@/shared/env", () => ({
   env: () => ({ MESSAGE_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64") }),
 }));
@@ -62,6 +66,7 @@ vi.mock("./crypto", () => ({ encrypt: () => "enc", decrypt: () => SECRET }));
 
 test("notifies the other Partenaire with a generic payload, never the text", async () => {
   await sendMessage({ userId: "me", coupleId: "c1" }, SECRET, sb as never);
+  await Promise.all(afterTasks);
   expect(lookup).toEqual({ couple: "c1", not: "me" });
   expect(notify).toHaveBeenCalledOnce();
   const [recipient, payload] = notify.mock.calls[0] as [string, Record<string, string>];
@@ -82,10 +87,12 @@ test("push failure never fails the send", async () => {
   ).resolves.toMatchObject({
     id: "7",
   });
+  await Promise.all(afterTasks);
   lookupError = new Error("db");
   await expect(
     sendMessage({ userId: "me", coupleId: "c1" }, SECRET, sb as never),
   ).resolves.toMatchObject({
     id: "7",
   });
+  await Promise.all(afterTasks);
 });

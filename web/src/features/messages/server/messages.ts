@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getTranslations } from "next-intl/server";
+import { after } from "next/server";
 import type { z } from "zod";
 
 import type { message, messagesQuery } from "@/shared/contracts/messages";
@@ -49,7 +50,7 @@ export async function sendMessage(
     .select(COLUMNS)
     .single();
   if (error) throw error;
-  await pushToPartner(partner);
+  after(() => pushToPartner(partner));
   return toMessage(data);
 }
 

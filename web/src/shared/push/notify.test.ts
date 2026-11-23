@@ -9,15 +9,20 @@ vi.mock("server-only", () => ({}));
 
 const deleted: string[] = [];
 let tokens: string[] = [];
+let platform = "web";
 let dbError: unknown = null;
 let accountB64 = "";
-vi.mock("@/shared/env", () => ({ env: () => ({ FIREBASE_SERVICE_ACCOUNT: accountB64 }) }));
+let configured = true;
+vi.mock("@/shared/env", () => ({
+  env: () => ({ FIREBASE_SERVICE_ACCOUNT: accountB64 }),
+  firebaseConfigured: () => configured,
+}));
 vi.mock("@/shared/supabase/server", () => ({
   adminClient: () => ({
     from: () => ({
       select: () => ({
         eq: async () => ({
-          data: dbError ? null : tokens.map((token) => ({ token })),
+          data: dbError ? null : tokens.map((token) => ({ token, platform })),
           error: dbError,
         }),
       }),
@@ -62,6 +67,8 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
   deleted.length = 0;
   tokens = ["t1"];
+  platform = "web";
+  configured = true;
   dbError = null;
   fcm = [];
   oauthCalls = 0;
@@ -104,8 +111,23 @@ test("sends the exact FCM message to every token of the user", async () => {
     notification: { title: "T", body: "B" },
     data: { url: "/messages", tag: "chat" },
     webpush: { notification: { tag: "chat" } },
-    android: { collapse_key: "chat", notification: { tag: "chat" } },
   });
+});
+
+test("android token gets a data-only message", async () => {
+  platform = "android";
+  await run();
+  expect(fcm[0]?.message).toEqual({
+    token: "t1",
+    data: { url: "/messages", tag: "chat", title: "T", body: "B" },
+    android: { priority: "HIGH", collapse_key: "chat" },
+  });
+});
+
+test("Firebase not configured -> no-op, no fetch, no throw", async () => {
+  configured = false;
+  await run();
+  expect(fetch).not.toHaveBeenCalled();
 });
 
 test("access token is cached between sends", async () => {

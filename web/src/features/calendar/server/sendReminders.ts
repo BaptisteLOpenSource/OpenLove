@@ -22,7 +22,7 @@ export async function sendReminders(now = new Date()): Promise<number> {
   const t = await getTranslations("reminder");
   let sent = 0;
   for (const r of dueReminders(dates.data as Row[], now)) {
-    const { couple_id } = dates.data.find((d) => d.id === r.id) as Row;
+    const { couple_id } = r as typeof r & { couple_id: string };
     const to = members.data
       .filter((m) => m.couple_id === couple_id && (!r.private_to || m.user_id === r.private_to))
       .map((m) => m.user_id as string);
@@ -30,10 +30,12 @@ export async function sendReminders(now = new Date()): Promise<number> {
       r.inDays === 0
         ? t("today", { label: r.label })
         : t("inDays", { label: r.label, days: r.inDays });
-    for (const userId of to) {
-      await notify(userId, { title: t("title"), body, url: "/", tag: `reminder-${r.id}` });
-      sent++;
-    }
+    await Promise.all(
+      to.map((userId) =>
+        notify(userId, { title: t("title"), body, url: "/", tag: `reminder-${r.id}` }),
+      ),
+    );
+    sent += to.length;
   }
   return sent;
 }

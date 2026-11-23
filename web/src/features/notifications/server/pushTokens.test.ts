@@ -8,6 +8,8 @@ vi.mock("server-only", () => ({}));
 let insertError: { code: string } | null = null;
 let owner: string | null = null;
 const inserted: unknown[] = [];
+let userTokens: string[] = [];
+const deleted: string[][] = [];
 vi.mock("@/shared/supabase/server", () => ({
   adminClient: () => ({
     from: () => ({
@@ -15,8 +17,20 @@ vi.mock("@/shared/supabase/server", () => ({
         inserted.push(row);
         return { error: insertError };
       },
+      delete: () => ({
+        in: async (_c: string, tokens: string[]) => {
+          deleted.push(tokens);
+          return { error: null };
+        },
+      }),
       select: () => ({
         eq: () => ({
+          order: () => ({
+            range: async (from: number) => ({
+              data: userTokens.slice(from).map((token) => ({ token })),
+              error: null,
+            }),
+          }),
           maybeSingle: async () => ({ data: owner ? { user_id: owner } : null, error: null }),
         }),
       }),
@@ -25,7 +39,9 @@ vi.mock("@/shared/supabase/server", () => ({
   partnerOf: vi.fn(),
   serverClient: vi.fn(),
 }));
+let configured = true;
 vi.mock("@/shared/env", () => ({
+  firebaseConfigured: () => configured,
   env: () => ({
     NEXT_PUBLIC_FIREBASE_PROJECT_ID: "p",
     NEXT_PUBLIC_FIREBASE_API_KEY: "k",
@@ -38,6 +54,9 @@ beforeEach(() => {
   insertError = null;
   owner = null;
   inserted.length = 0;
+  userTokens = [];
+  deleted.length = 0;
+  configured = true;
 });
 
 test("new token is stored for the caller", async () => {
@@ -45,6 +64,18 @@ test("new token is stored for the caller", async () => {
     registered: true,
   });
   expect(inserted).toEqual([{ user_id: "u1", token: "t", platform: "web" }]);
+});
+
+test("11th token -> oldest deleted, newest 10 stay", async () => {
+  userTokens = Array.from({ length: 12 }, (_, i) => `t${i}`);
+  await registerPushToken("u1", { token: "t0", platform: "web" });
+  expect(deleted).toEqual([["t10", "t11"]]);
+});
+
+test("10 tokens or fewer -> nothing deleted", async () => {
+  userTokens = Array.from({ length: 10 }, (_, i) => `t${i}`);
+  await registerPushToken("u1", { token: "t0", platform: "web" });
+  expect(deleted).toEqual([]);
 });
 
 test("same token again by its owner -> registered", async () => {
@@ -67,6 +98,13 @@ test("token owned by the other Partenaire -> 403 forbidden", async () => {
 test("other db error propagates", async () => {
   insertError = { code: "XX000" };
   await expect(registerPushToken("u1", { token: "t", platform: "web" })).rejects.toBeDefined();
+});
+
+test("push config without Firebase -> 404 not_found", () => {
+  configured = false;
+  expect(() => getPushConfig()).toThrow(
+    expect.objectContaining({ status: 404, code: "not_found" }),
+  );
 });
 
 test("push config maps env to the contract", () => {

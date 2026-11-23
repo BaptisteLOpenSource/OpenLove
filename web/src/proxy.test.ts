@@ -138,12 +138,12 @@ test.each(PUBLIC_API)("public API %s passes with no token, no claim check", asyn
   expect(claimsCalls).toEqual([]);
 });
 
-test('every auth:"public" route is in the proxy public list', () => {
+test('every auth:"public" or auth:"cron" route is in the proxy public list', () => {
   const root = join(process.cwd(), "src/app/api");
   const publicRoutes = (readdirSync(root, { recursive: true }) as string[])
     .filter((f) => f.endsWith("route.ts"))
-    .filter((f) => readFileSync(join(root, f), "utf8").includes('auth: "public"'))
-    .map((f) => `/api/${dirname(f)}`.replace(/\/\.$/, ""));
+    .filter((f) => /auth: "(public|cron)"/.test(readFileSync(join(root, f), "utf8")))
+    .map((f) => `/api/${dirname(f)}`.replaceAll("\\", "/").replace(/\/\.$/, ""));
   expect(publicRoutes.length).toBeGreaterThan(0);
   for (const path of publicRoutes) expect(PUBLIC_API).toContain(path);
 });
