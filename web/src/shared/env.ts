@@ -24,6 +24,7 @@ const firebaseKey = (anchor: string) =>
   z
     .string()
     .min(1)
+    .optional()
     .meta({ docUrl: guide(anchor) });
 
 export const envSchema = z.object({
@@ -49,7 +50,9 @@ export const envSchema = z.object({
     .string()
     .min(32)
     .meta({ docUrl: guide("setup_token") }),
-  FIREBASE_SERVICE_ACCOUNT: serviceAccount.meta({ docUrl: guide("firebase_service_account") }),
+  FIREBASE_SERVICE_ACCOUNT: serviceAccount
+    .optional()
+    .meta({ docUrl: guide("firebase_service_account") }),
   FIREBASE_ANDROID_APP_ID: firebaseKey("firebase_android_app_id"),
   NEXT_PUBLIC_FIREBASE_API_KEY: firebaseKey("next_public_firebase_api_key"),
   NEXT_PUBLIC_FIREBASE_PROJECT_ID: firebaseKey("next_public_firebase_project_id"),
@@ -61,6 +64,9 @@ export const envSchema = z.object({
     .min(16)
     .meta({ docUrl: guide("cron_secret") }),
 });
+
+// Firebase is all-or-nothing: push works only with the 7 vars, a partial set is invalid.
+export const FIREBASE_KEYS = Object.keys(envSchema.shape).filter((k) => /FIREBASE_/.test(k));
 
 export const publicEnvSchema = envSchema.pick({
   NEXT_PUBLIC_SUPABASE_URL: true,
@@ -74,7 +80,18 @@ export const publicEnvSchema = envSchema.pick({
 
 let cached: z.infer<typeof envSchema> | undefined;
 
+const hasFirebase = (e: Record<string, unknown>) => FIREBASE_KEYS.every((k) => e[k]);
+
 // Lazy: build and tests run without .env.
 export function env() {
-  return (cached ??= envSchema.parse(process.env));
+  return (cached ??= envSchema
+    .refine(
+      (e) => hasFirebase(e) || FIREBASE_KEYS.every((k) => !(e as Record<string, unknown>)[k]),
+      {
+        message: "Firebase variables must be all set or all unset",
+      },
+    )
+    .parse(process.env));
 }
+
+export const firebaseConfigured = () => hasFirebase(env() as Record<string, unknown>);

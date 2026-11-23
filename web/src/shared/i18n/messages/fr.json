@@ -8,6 +8,7 @@
     "intro": "Variables d'environnement requises par cette instance. Les valeurs ne sont jamais affichées.",
     "status": {
       "ok": "OK",
+      "optional": "Facultative",
       "missing": "Manquante",
       "invalid": "Invalide"
     },
@@ -57,8 +58,9 @@
         ]
       },
       "firebase": {
-        "title": "3. Firebase",
+        "title": "3. Firebase (facultatif)",
         "instructions": [
+          "Étape facultative : sans Firebase, l'app fonctionne sans notifications push ni Rappels envoyés. Renseignez les 7 variables ou aucune.",
           "Créez un projet Firebase puis ajoutez-y une app Web et une app Android.",
           "Cloud Messaging : générez une paire de clés Web Push (clé VAPID).",
           "Project Settings > Service accounts : générez une clé privée, encodez le fichier JSON en base64.",

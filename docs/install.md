@@ -34,12 +34,13 @@ Checklist de sécurité du tableau de bord hébergé :
 - [ ] **Database > Settings** : Enforce SSL activé, restrictions réseau (allowlist). L'app utilise HTTPS, seul Postgres direct est concerné.
 - [ ] **Advisors > Security Advisor** : aucun WARN.
 
-## 3. Firebase
+## 3. Firebase (facultatif)
 
-1. Créez un projet Firebase puis ajoutez-y une app Web et une app Android.
-2. Cloud Messaging : générez une paire de clés Web Push (clé VAPID).
-3. Project Settings > Service accounts : générez une clé privée, encodez le fichier JSON en base64.
-4. Copiez les identifiants de projet et des apps dans les variables ci-dessous.
+1. Étape facultative : sans Firebase, l'app fonctionne sans notifications push ni Rappels envoyés. Renseignez les 7 variables ou aucune.
+2. Créez un projet Firebase puis ajoutez-y une app Web et une app Android.
+3. Cloud Messaging : générez une paire de clés Web Push (clé VAPID).
+4. Project Settings > Service accounts : générez une clé privée, encodez le fichier JSON en base64.
+5. Copiez les identifiants de projet et des apps dans les variables ci-dessous.
 
 Variables à renseigner dans Vercel :
 
