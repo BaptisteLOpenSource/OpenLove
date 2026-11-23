@@ -63,7 +63,7 @@ arrivent epic par epic. Suis l'avancement sur le tableau de projet GitHub.
 1. Cliquer sur **Deploy to Vercel** (lien ajouté à la première version).
 2. Ouvrir ton nouveau site : la page **/setup** te guide pour Supabase, Firebase et les clés à
    coller dans Vercel, en vérifiant chacune en direct.
-   Étapes détaillées : [docs/install.md](docs/install.md).
+   Étapes détaillées : [wiki](https://openlove.baptisteledev.fr/wiki/installer/).
 3. Renseigner vos prénoms, la date de début et la couleur. Terminé.
 4. Android : télécharger l'APK depuis Releases, ouvrir **Réglages** sur le web, scanner le QR code.
 
@@ -119,7 +119,7 @@ Bug ou idée : ouvrir une [issue](https://github.com/BaptisteLOpenSource/OpenLov
 
 ## Documentation
 
-- [Installation](docs/install.md) : déploiement pas à pas
+- [Installation](https://openlove.baptisteledev.fr/wiki/installer/) : déploiement pas à pas
 - [Architecture](ARCHITECTURE.md) : structure, règles, correctifs de sécurité
 - [Vocabulaire du domaine](CONTEXT.md) : glossaire
 - [Décisions](docs/decisions/) : décisions d'architecture (ADR)
