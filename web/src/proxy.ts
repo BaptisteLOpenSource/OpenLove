@@ -13,12 +13,15 @@ export const PUBLIC_API = [
   "/api/pairing",
   "/api/theme",
 ];
+// Invite token is the credential: only this prefix is opened.
+const INVITE_PREFIX = "/invite/";
 const PUBLIC = new Set([...PUBLIC_PAGES, ...PUBLIC_API]);
 
 // Single guard: a valid JWT is not enough, the server-set role claim must be present.
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  if (PUBLIC.has(pathname)) return NextResponse.next({ request: req });
+  if (PUBLIC.has(pathname) || pathname.startsWith(INVITE_PREFIX))
+    return NextResponse.next({ request: req });
   const api = pathname.startsWith("/api/");
   // Bearer for Android; without it getClaims reads the cookie session (web UI).
   const token = api ? bearerToken(req) : undefined;

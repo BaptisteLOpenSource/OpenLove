@@ -84,7 +84,22 @@
       "qrAlt": "QR code d'appairage",
       "expires": "Expire à {time}",
       "refused": "Action refusée."
+    },
+    "invite": {
+      "title": "Inviter votre partenaire",
+      "intro": "Générez un lien d'invitation. Il expire après 24 heures et ne sert qu'une fois.",
+      "create": "Générer le lien",
+      "linkLabel": "Lien d'invitation",
+      "refused": "Action refusée."
     }
+  },
+  "invite": {
+    "title": "Rejoindre le couple",
+    "email": "E-mail",
+    "password": "Mot de passe (8 caractères minimum)",
+    "submit": "Créer mon compte",
+    "invalid": "Invitation invalide, expirée, ou informations incorrectes.",
+    "rate_limited": "Trop de tentatives. Réessayez dans quelques minutes."
   },
   "home": {
     "partners": "{a} & {b}",

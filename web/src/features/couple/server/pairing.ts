@@ -11,7 +11,7 @@ import { PAIRING_TTL_SECONDS } from "../domain/pairing";
 import { hitRateLimit } from "./rateLimit";
 import { toSession } from "./session";
 
-const sha256 = (code: string) => createHash("sha256").update(code).digest("hex");
+export const sha256 = (code: string) => createHash("sha256").update(code).digest("hex");
 const invalidCode = () => new ApiError(401, "unauthorized", "invalid pairing code");
 
 export async function createPairingCode(
