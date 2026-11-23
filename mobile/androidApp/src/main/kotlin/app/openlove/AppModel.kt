@@ -7,7 +7,9 @@ import app.openlove.core.api.OpenLoveClient
 import app.openlove.core.api.ThemeResponse
 import app.openlove.core.session.PairingLink
 import app.openlove.core.theme.ThemeCache
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 
@@ -35,6 +37,8 @@ enum class PairingError { CodeExpired, BadCredentials, NotMember, RateLimited, I
 class AppModel(
     private val client: OpenLoveClient,
     private val themeCache: ThemeCache,
+    private val chatWake: SharedFlow<Unit> = MutableSharedFlow(),
+    private val onHome: suspend () -> Unit = {},
 ) {
     private val _screen = MutableStateFlow<Screen>(Screen.Loading)
     val screen: StateFlow<Screen> = _screen
@@ -62,7 +66,7 @@ class AppModel(
     private suspend fun showHome(load: suspend () -> HomeResponse = { client.home() }) {
         _screen.value =
             try {
-                loadHome(load)
+                loadHome(load).also { onHome() }
             } catch (e: ApiException) {
                 if (e.status == 401) Screen.Pairing() else Screen.Unreachable
             } catch (e: IOException) {
@@ -72,7 +76,8 @@ class AppModel(
 
     fun openChat() {
         (_screen.value as? Screen.Home)?.let {
-            _screen.value = Screen.Chat(it, ChatModel(client, onSessionLost = { _screen.value = Screen.Pairing() }))
+            val chat = ChatModel(client, onSessionLost = { _screen.value = Screen.Pairing() }, wake = chatWake)
+            _screen.value = Screen.Chat(it, chat)
         }
     }
 
