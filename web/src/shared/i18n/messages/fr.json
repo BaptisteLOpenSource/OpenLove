@@ -121,6 +121,7 @@
     "logout": "Se déconnecter",
     "settings": "Réglages",
     "messages": "Messages",
+    "archive": "Archive",
     "milestone": {
       "title": "Ensemble depuis",
       "totalDays": "{count, plural, =0 {0 jour} one {# jour} other {# jours}}",
@@ -170,5 +171,27 @@
     "title": "Rappel",
     "today": "{label}, c'est aujourd'hui !",
     "inDays": "{label}, dans {days} jours."
+  },
+  "reveal": {
+    "title": "Archive",
+    "empty": "Rien pour l'instant.",
+    "kind": { "surprise": "Surprise", "letter": "Lettre" },
+    "locked": {
+      "surprise": "Une surprise arrive le {date}",
+      "letter": "Une lettre arrive le {date}"
+    },
+    "scheduled": "programmée pour {date}",
+    "form": {
+      "kind": "Type",
+      "title": "Titre",
+      "body": "Message",
+      "revealAt": "Date et heure de révélation",
+      "submit": "Programmer",
+      "sent": "Programmé.",
+      "error": {
+        "invalid": "Date passée ou champs invalides.",
+        "failed": "Envoi impossible, réessayez."
+      }
+    }
   }
 }

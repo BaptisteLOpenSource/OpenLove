@@ -8,7 +8,7 @@ chat content. Options: pgcrypto (key passed in SQL, lands in query logs), Vault/
 in the same database, pgsodium being deprecated upstream), app-side encryption.
 
 ## Decision
-`web/src/features/messages/server/crypto.ts` encrypts with Node `aes-256-gcm` (random 12-byte IV,
+`web/src/shared/crypto.ts` encrypts with Node `aes-256-gcm` (random 12-byte IV,
 auth tag, stored as base64 `iv|ciphertext|tag` in `messages.body_enc`). Key =
 `MESSAGE_ENCRYPTION_KEY` (32 bytes base64) in the one Zod env schema, shown on `/setup`. The key
 never enters the database.

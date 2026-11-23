@@ -5,11 +5,10 @@ import { after } from "next/server";
 import type { z } from "zod";
 
 import type { message, messagesQuery } from "@/shared/contracts/messages";
+import { decrypt, encrypt } from "@/shared/crypto";
 import { env } from "@/shared/env";
 import { notify } from "@/shared/push/notify";
 import { adminClient, type Partner } from "@/shared/supabase/server";
-
-import { decrypt, encrypt } from "./crypto";
 
 type Message = z.input<typeof message>;
 type Row = { id: number; author_id: string; body_enc: string; created_at: string };
