@@ -10,7 +10,7 @@ import app.openlove.push.PushRegistrar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -24,7 +24,7 @@ class AppContainer(
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     // A chat push wakes the open chat's poll.
-    val chatWake = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val chatWake = Channel<Unit>(Channel.CONFLATED)
 
     @Volatile
     var foreground = false

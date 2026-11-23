@@ -13,8 +13,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -45,7 +44,7 @@ class ChatModelTest {
     private val pages = HashMap<String, String>()
     private var sent = msg("11")
 
-    private fun model(wake: SharedFlow<Unit> = MutableSharedFlow()): ChatModel {
+    private fun model(wake: ReceiveChannel<Unit> = Channel(Channel.CONFLATED)): ChatModel {
         val engine =
             MockEngine {
                 val query = it.url.encodedQuery.let { q -> if (q.isEmpty()) "" else "?$q" }
@@ -101,11 +100,24 @@ class ChatModelTest {
     fun wakeTriggersRefreshBeforeTheNextTick() =
         runTest {
             pages["GET /api/messages"] = page(null, "1")
-            val wake = MutableSharedFlow<Unit>()
+            val wake = Channel<Unit>(Channel.CONFLATED)
             val job = launch { model(wake).poll() }
             requests.receive()
             runCurrent()
-            wake.emit(Unit)
+            wake.send(Unit)
+            requests.receive()
+            assertEquals(0L, testScheduler.currentTime)
+            job.cancelAndJoin()
+        }
+
+    @Test
+    fun wakeSentDuringRefreshStillTriggersNextRefresh() =
+        runTest {
+            pages["GET /api/messages"] = page(null, "1")
+            val wake = Channel<Unit>(Channel.CONFLATED)
+            wake.send(Unit)
+            val job = launch { model(wake).poll() }
+            requests.receive()
             requests.receive()
             assertEquals(0L, testScheduler.currentTime)
             job.cancelAndJoin()

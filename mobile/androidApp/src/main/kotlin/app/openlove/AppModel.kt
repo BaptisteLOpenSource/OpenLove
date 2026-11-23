@@ -7,9 +7,9 @@ import app.openlove.core.api.OpenLoveClient
 import app.openlove.core.api.ThemeResponse
 import app.openlove.core.session.PairingLink
 import app.openlove.core.theme.ThemeCache
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 
@@ -37,7 +37,7 @@ enum class PairingError { CodeExpired, BadCredentials, NotMember, RateLimited, I
 class AppModel(
     private val client: OpenLoveClient,
     private val themeCache: ThemeCache,
-    private val chatWake: SharedFlow<Unit> = MutableSharedFlow(),
+    private val chatWake: ReceiveChannel<Unit> = Channel(Channel.CONFLATED),
     private val onHome: suspend () -> Unit = {},
 ) {
     private val _screen = MutableStateFlow<Screen>(Screen.Loading)
