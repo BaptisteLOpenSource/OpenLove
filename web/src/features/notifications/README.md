@@ -11,5 +11,7 @@ Push FCM, web et Android ([ADR 0004](../../../../docs/decisions/0004-fcm-single-
 - Tokens: table `push_tokens`, service role seulement. `POST /api/push-tokens` fait un insert,
   jamais un upsert: token déjà pris par l'autre Partenaire = 403 (S6).
 - `GET /api/push-config`: config Firebase pour l'init runtime d'Android (pas de google-services.json).
+- Firebase facultatif, tout ou rien (7 variables): absent -> `notify` ne fait rien, `push-config`
+  répond 404, pas de bouton dans `/settings`. Partiel -> `env()` échoue, `/setup` le signale.
 - Web: `public/firebase-messaging-sw.js` sans SDK, affiche `payload.notification`; clic = `data.url`
   seulement si same-origin (S7), sinon `/`. Activation depuis `/settings` (`ui/PushToggle`).
