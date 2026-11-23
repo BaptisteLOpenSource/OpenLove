@@ -28,8 +28,8 @@ class PushService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        if (message.data["tag"] != CHAT) return
-        container.chatWake.tryEmit(Unit)
+        val tag = message.data["tag"]
+        if (tag == CHAT) container.chatWake.trySend(Unit)
         if (container.foreground) return
         val open =
             PendingIntent.getActivity(
@@ -38,16 +38,16 @@ class PushService : FirebaseMessagingService() {
                 Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
             )
-        // No Message content in the notification; fixed tag makes the next one replace it.
+        // Data-only push: we build the notification; same tag replaces the previous one.
         val notification =
             Notification
                 .Builder(this, CHAT)
                 .setSmallIcon(android.R.drawable.stat_notify_chat)
-                .setContentTitle(getString(R.string.push_chat_title))
-                .setContentText(getString(R.string.push_chat_text))
+                .setContentTitle(message.data["title"] ?: getString(R.string.push_chat_title))
+                .setContentText(message.data["body"] ?: getString(R.string.push_chat_text))
                 .setContentIntent(open)
                 .setAutoCancel(true)
                 .build()
-        getSystemService(NotificationManager::class.java).notify(CHAT, 0, notification)
+        getSystemService(NotificationManager::class.java).notify(tag ?: CHAT, 0, notification)
     }
 }

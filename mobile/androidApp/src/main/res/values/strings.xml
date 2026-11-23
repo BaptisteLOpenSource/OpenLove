@@ -46,7 +46,7 @@
     <string name="push_chat_title">Nouveau message</string>
     <string name="push_chat_text">Ouvrez l'app pour le lire.</string>
     <string name="push_permission_title">Notifications</string>
-    <string name="push_permission_text">Recevez une alerte quand votre partenaire vous écrit.</string>
+    <string name="push_permission_text">Recevez une alerte quand votre partenaire vous Ã©crit.</string>
     <string name="push_permission_allow">Activer</string>
     <string name="push_permission_later">Plus tard</string>
     <plurals name="home_total_days">
